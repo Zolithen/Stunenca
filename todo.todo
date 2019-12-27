@@ -1,0 +1,18 @@
+-5 Main Engine Thingies
+	-5 MAKE EVERYTHING SERVER-CLIENT FRIENDLY + MULTIPLATFORM
+	-4 Sending LÖVE events in the engine
+	-3 Screen Space GUI system
+	-3 The game state/scene stack
+	-2 State machine
+	-2 Animation system
+
+Make it node based lol
+-3 Game states
+	-2 Every table can act as a state
+	-2 You can push and pop states from the stack.
+	-2 You can block events for lower states in the stack. These states will receive a weak event.
+	-2 Every state has its scenes.
+	-3 Scenes
+		-2 A scene is a sub-master node that can be instantiated
+	-3 Nodes
+		-2 A node is a thing
