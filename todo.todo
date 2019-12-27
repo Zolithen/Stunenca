@@ -20,4 +20,6 @@ Make it node based lol
 	-3 Scenes
 		-2 A scene is a sub-master node that can be instantiated
 	-3 Nodes
-		-2 A node is the most basic unit in the tree state graph
+		-2 A node is the most basic unit in the tree state graph.
+		-3 Game nodes
+			-2 Each game node has a component list.

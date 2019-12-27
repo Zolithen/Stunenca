@@ -1,63 +1,44 @@
 
+require "cmath"
 require "eng/tree"
 require "eng/game_state"
 
-print("creating base")
-local scene = new_tree("no", 10000)
+local scene = new_tree("scene")
 
-local menu = new_tree("yes")
-
-local player = new_tree("player", {x = 0, y = 0})
+local menu = new_tree("menu")
 
 menu:set("title", {draw=function(self) love.graphics.print("sfa", 100, 100) end})
 
-player:set("movement", {update=function(self, node)
+local player = new_game_node("player")
+player.hello=true
+
+player:add_event("update", function(self, dt)
 	if love.keyboard.isDown("w") then
-		node.father.value.y = node.father.value.y - 3
+		self.y = self.y - 3
 	end
 	if love.keyboard.isDown("s") then
-		node.father.value.y = node.father.value.y + 3
+		self.y = self.y + 3
 	end
 	if love.keyboard.isDown("a") then
-		node.father.value.x = node.father.value.x - 3
+		self.x = self.x - 3
 	end
 	if love.keyboard.isDown("d") then
-		node.father.value.x = node.father.value.x + 3
+		self.x = self.x + 3
 	end
-end})
+end)
 
-player:set("renderer", {draw=function(self, node)
-	love.graphics.rectangle("fill",  node.father.value.x,  node.father.value.y, 16, 16)	
-end})
+player:add_event("draw", function(self)
+	love.graphics.rectangle("fill",  self.x,  self.y, 16, 16)	
+end)
 
 menu:set(player)
 
 scene:set(menu)
 
---[[scene:set(
-	"player",
-	{	
-		x = 0,
-		y = 0,
-		update = function(self, node, dt)
-			if love.keyboard.isDown("w") then
-				self.y = self.y - 3
-			end
-			if love.keyboard.isDown("s") then
-				self.y = self.y + 3
-			end
-			if love.keyboard.isDown("a") then
-				self.x = self.x - 3
-			end
-			if love.keyboard.isDown("d") then
-				self.x = self.x + 3
-			end
-		end,
-		draw = function(self, node)
-			love.graphics.rectangle("fill", self.x, self.y, 16, 16)
-		end
-	}
-)]]
+--[[for i, v in pairs(scene:find("player")) do
+	print(i, v)
+end]]
+print(scene:find("player"):get_value("hello"))
 
 function love.load()
 
@@ -66,9 +47,9 @@ end
 function love.update(dt)
 	scene:traverse(
 		function(t, nx)
-			if type(t.value) == "table" then
+			if is_game_node(t) then
 				if t.value.update then
-					t.value:update(t, dt)
+					t.value:update(dt)
 				end
 			end
 		end
@@ -79,16 +60,15 @@ function love.draw()
 	local y = 0
 	scene:traverse(
 		function(t, nx)
-			if type(t.value) == "table" then
+			if is_game_node(t) then
 				if t.value.draw then
-					t.value:draw(t)
+					t.value:draw()
 				end
 			end
 			love.graphics.print(t.name .. ":"  .. tostring(t.value), nx*16, y)
 			y = y + 16
 		end
 	)
-	--draw_tree(scene, "fskpioa", 0, 0)
 end
 
 function love.keypressed(key)
