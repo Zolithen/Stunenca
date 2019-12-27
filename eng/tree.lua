@@ -48,6 +48,11 @@ function tr:get_value(n)
 	if type(self.value) == "table" then return self.value[n] end
 end
 
+-- Sets a value from the value table
+function tr:set_value(n, v)
+	if type(self.value) == "table" then self.value[n] = v end
+end
+
 -- Creates a new tree
 function new_tree(name, n, fa)
 	print("new " .. tostring(name) .. "," .. tostring(n))
@@ -75,9 +80,9 @@ end
 
 gnv.__index = gnv_index
 gn.__index = gn_index
-gn.__newindex = function(t, k, v)
+--[[gn.__newindex = function(t, k, v)
 	if t.value then t.value[k] = v end
-end
+end]]
 
 function new_game_node(name, fa)
 	local t = new_tree(name, {

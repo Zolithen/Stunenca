@@ -2,6 +2,7 @@
 require "cmath"
 require "eng/tree"
 require "eng/game_state"
+require "eng/console"
 
 local scene = new_tree("scene")
 
@@ -10,7 +11,7 @@ local menu = new_tree("menu")
 menu:set("title", {draw=function(self) love.graphics.print("sfa", 100, 100) end})
 
 local player = new_game_node("player")
-player.hello=true
+player:set_value("hello", true)
 
 player:add_event("update", function(self, dt)
 	if love.keyboard.isDown("w") then
@@ -26,7 +27,6 @@ player:add_event("update", function(self, dt)
 		self.x = self.x + 3
 	end
 end)
-
 player:add_event("draw", function(self)
 	love.graphics.rectangle("fill",  self.x,  self.y, 16, 16)	
 end)
@@ -35,10 +35,11 @@ menu:set(player)
 
 scene:set(menu)
 
---[[for i, v in pairs(scene:find("player")) do
-	print(i, v)
-end]]
 print(scene:find("player"):get_value("hello"))
+
+scene:set(create_console())
+
+love.keyboard.setKeyRepeat(true)
 
 function love.load()
 
@@ -71,8 +72,28 @@ function love.draw()
 	)
 end
 
-function love.keypressed(key)
+function love.textinput(text)
+	scene:traverse(
+		function(t, nx)
+			if is_game_node(t) then
+				if t.value.textinput then
+					t.value:textinput(text)
+				end
+			end
+		end
+	)
+end
 
+function love.keypressed(key)
+	scene:traverse(
+		function(t, nx)
+			if is_game_node(t) then
+				if t.value.keypressed then
+					t.value:keypressed(key)
+				end
+			end
+		end
+	)
 end
 
 function love.keyreleased(key)

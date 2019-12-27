@@ -2,7 +2,7 @@
 	-5 MAKE EVERYTHING SERVER-CLIENT FRIENDLY + MULTIPLATFORM
 	-4 Sending LÖVE events in the engine
 	-3 Screen Space GUI system
-	-3 The game state/scene stack
+	+-3 Architecture system
 	-3 In-game developer console system
 	-2 State machine
 	-2 Animation system
@@ -11,15 +11,7 @@
 	-2 Timer system
 	-2 Compression for Zariel projects (zlib if possible)
 
-Make it node based lol
--3 Game states
-	-2 Every table can act as a state
-	-2 You can push and pop states from the stack.
-	-2 You can block events for lower states in the stack. These states will receive a weak event.
-	-2 Every state has its scenes.
-	-3 Scenes
-		-2 A scene is a sub-master node that can be instantiated
-	-3 Nodes
-		-2 A node is the most basic unit in the tree state graph.
-		-3 Game nodes
-			-2 Each game node has a component list.
+-4 The architecture of the engine
+	-2 The engine is structured like a tree
+	-2 Every node has its value, children, name and father.
+	-2 The special node "game_node" is the basic building block.
