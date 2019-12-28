@@ -23,10 +23,11 @@ end
 
 -- Executes a function for every children of the tree
 function tr:traverse(func, nx)
-	func(self, (nx or 0))
-	nx = (nx or 0) + 1 -- Level of recursion
-	for _, v in pairs(self.children) do
-		v:traverse(func, (nx or 0))
+	if not func(self, (nx or 0)) then
+		nx = (nx or 0) + 1 -- Level of recursion
+		for _, v in pairs(self.children) do
+			v:traverse(func, (nx or 0))
+		end
 	end
 end
 
@@ -60,7 +61,9 @@ function new_tree(name, n, fa)
 		children = {},
 		value = n or {},
 		name = name or "",
-		father = fa or {}
+		father = fa or {},
+		active = true,
+		visible = true
 	}
 
 	setmetatable(t, {__index=tr})
@@ -102,4 +105,24 @@ function is_game_node(node)
 		end
 	end
 	return false
+end
+
+local oldk = love.keyboard.isDown
+
+should_act_keys = true
+
+function love.keyboard.isDown(key)
+	return (oldk(key) and should_act_keys)
+end
+
+function block_keys()
+	should_act_keys = false
+end
+
+function clipx(x)
+	return x*love.graphics.getWidth()
+end
+
+function clipy(y)
+	return y*love.graphics.getHeight()
 end

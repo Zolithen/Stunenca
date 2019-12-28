@@ -25,23 +25,63 @@ menu:set(player)]]
 
 function create_console()
 	local console = new_game_node("console")
+	console:set_value("font", love.graphics.newFont("defont.ttf", 16))
+	console:set_value("def_font", love.graphics.getFont())
+	console:set_value("log", {})
 
 	console:add_event("textinput", function(self, text)
-		self.text = (self.text or "") .. text
+		if self.node.visible then
+			self.text = (self.text or "") .. text
+		end
 	end)
 
 	console:add_event("keypressed", function(self, key)
 		print(key)
-		if key == "return" then
-			loadstring(self.text)()
-			self.text = ""
-		elseif key == "backspace" then
-			self.text = self.text:sub(1, #self.text-1)
+		if key == "f4" then
+			self.node.visible = not self.node.visible
+		end
+		if self.node.visible then
+			if key == "return" then
+				loadstring(self.text)()
+				table.insert(self.log, self.text)
+				self.text = ""
+			elseif key == "backspace" then
+				self.text = self.text:sub(1, #self.text-1)
+			elseif key == "up" then
+				self.text = self.log[#self.log]
+			end
+			block_keys()
+		else
+			should_act_keys = true
 		end
 	end)
 
+	console:add_event("keyreleased", function(self, key)
+		if self.node.visible then
+			should_act_keys = true
+		end
+	end)
+
+	--console:add_event("update")
+
 	console:add_event("draw", function(self)
-		love.graphics.print(self.text or "", 200, 200)
+		love.graphics.setFont(self.font)
+		love.graphics.setColor(0.2, 0.2, 0.2, 0.75)
+		love.graphics.rectangle("fill", 0, 0, clipx(1), clipy(0.75))
+		love.graphics.setColor(1, 1, 1, 1)
+		love.graphics.print(self.text or "", 0, clipy(0.72))
+		local y = 0.68
+		--[[local mytable = {'a', 'b', 'c'}
+for i = #mytable, 1, -1 do
+    value = mytable[i]
+    print(i .. ": " .. value)
+end]]
+		for i = #self.log, 1, -1 do
+			local v = self.log[i]
+			love.graphics.print(v, 0, clipy(y))
+			y = y - 0.04
+		end
+		love.graphics.setFont(self.def_font)
 	end)
 
 	return console

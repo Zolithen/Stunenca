@@ -4,7 +4,7 @@ require "eng/tree"
 require "eng/game_state"
 require "eng/console"
 
-local scene = new_tree("scene")
+scene = new_tree("scene")
 
 local menu = new_tree("menu")
 
@@ -31,13 +31,13 @@ player:add_event("draw", function(self)
 	love.graphics.rectangle("fill",  self.x,  self.y, 16, 16)	
 end)
 
-menu:set(player)
-
-scene:set(menu)
-
-print(scene:find("player"):get_value("hello"))
 
 scene:set(create_console())
+scene:set(player)
+
+--scene:set(menu)
+
+--print(scene:find("player"):get_value("hello"))
 
 love.keyboard.setKeyRepeat(true)
 
@@ -55,6 +55,7 @@ function love.update(dt)
 			end
 		end
 	)
+	--should_act_keys = true
 end
 
 function love.draw()
@@ -62,7 +63,7 @@ function love.draw()
 	scene:traverse(
 		function(t, nx)
 			if is_game_node(t) then
-				if t.value.draw then
+				if t.value.draw and t.visible then
 					t.value:draw()
 				end
 			end
@@ -89,7 +90,9 @@ function love.keypressed(key)
 		function(t, nx)
 			if is_game_node(t) then
 				if t.value.keypressed then
-					t.value:keypressed(key)
+					if t.value:keypressed(key) then 
+						return true
+					end
 				end
 			end
 		end
