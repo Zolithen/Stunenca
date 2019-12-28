@@ -11,7 +11,8 @@
 	-2 Timer system
 	-2 Compression for Zariel projects (zlib if possible)
 
--4 The architecture of the engine
-	-2 The engine is structured like a tree
-	-2 Every node has its value, children, name and father.
+-4 The architecture of the Engine
+	-2 The engine is structured like a tree.
+	-2 Every node has its value, children, name, father and z coordinate.
+	-2 The z coordinate in a node indicates position in children of father like in the Cocos2d Engine.
 	-2 The special node "game_node" is the basic building block.
