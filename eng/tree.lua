@@ -67,6 +67,27 @@ function tr:event(name, ...)
 
 end
 
+-- Reorders the listeners
+function tr:event_order(name, event, order)
+	if self.listeners[event] ~= nil then
+		if order == -1 then
+			local temps = table.copy(self.listeners[event])
+			for i, v in pairs(temps) do print(i, v) end
+			local list_set = Set(temps)
+			local res = {}
+			print(list_set[name])
+			for i, v in pairs(temps) do
+				print(i, v, list_set[name])
+				if not (i == list_set[name]) then
+					table.insert(res, v)
+				end
+			end
+			table.insert(res, name)
+			self.listeners[event] = table.copy(res)
+		end
+	end
+end
+
 -- Iterates all over a tree until finding a node with name n
 function tr:find(n)
 	if self.name == n then return self end

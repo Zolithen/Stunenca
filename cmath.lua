@@ -240,3 +240,11 @@ function math.boverlap(b1, b2)
          b1.y < b2.y+b2.h and
          b2.y < b1.y+b1.h
 end
+
+function Set (list)
+  local set = {}
+  for i, l in ipairs(list) do 
+    set[l] = i 
+  end
+  return set
+end
