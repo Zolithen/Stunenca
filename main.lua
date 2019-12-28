@@ -31,9 +31,23 @@ player:add_event("draw", function(self)
 	love.graphics.rectangle("fill",  self.x,  self.y, 16, 16)	
 end)
 
-
+--[[scene:set(create_console()):order(
+	"console", "draw", -1, "keypressed", 1, "keyreleased", 1
+)]]
 scene:set(create_console())
 scene:set(player)
+
+scene:node_listen("player")
+scene:node_listen("console")
+scene:node_listen("title")
+
+--[[scene:listen("draw", "console", "player", "title")
+scene:listen("update", "console", "player")
+scene:listen("keypressed", "console")
+scene:listen("keyreleased", "console")
+scene:listen("textinput", "console")]]
+
+--scene:apply_order()
 
 --scene:set(menu)
 
@@ -46,57 +60,19 @@ function love.load()
 end
 
 function love.update(dt)
-	scene:traverse(
-		function(t, nx)
-			if is_game_node(t) then
-				if t.value.update then
-					t.value:update(dt)
-				end
-			end
-		end
-	)
-	--should_act_keys = true
+	scene:event("update", dt)
 end
 
 function love.draw()
-	local y = 0
-	scene:traverse(
-		function(t, nx)
-			if is_game_node(t) then
-				if t.value.draw and t.visible then
-					t.value:draw()
-				end
-			end
-			love.graphics.print(t.name .. ":"  .. tostring(t.value), nx*16, y)
-			y = y + 16
-		end
-	)
+	scene:event("draw")
 end
 
 function love.textinput(text)
-	scene:traverse(
-		function(t, nx)
-			if is_game_node(t) then
-				if t.value.textinput then
-					t.value:textinput(text)
-				end
-			end
-		end
-	)
+	scene:event("textinput", text)
 end
 
 function love.keypressed(key)
-	scene:traverse(
-		function(t, nx)
-			if is_game_node(t) then
-				if t.value.keypressed then
-					if t.value:keypressed(key) then 
-						return true
-					end
-				end
-			end
-		end
-	)
+	scene:event("keypressed", key)
 end
 
 function love.keyreleased(key)

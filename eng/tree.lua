@@ -14,7 +14,7 @@ end
 
 -- Sets a new or old node as children
 function tr:set(name, n)
-	print("set " .. tostring(name) .. "," .. tostring(n))
+	--print("set " .. tostring(name) .. "," .. tostring(n))
 	if type(name) == "string" then self.children[name] = new_tree(name, n, self) 
 	else self.children[name] = name  end
 
@@ -31,16 +31,51 @@ function tr:traverse(func, nx)
 	end
 end
 
+-- Adds nodes for event listening
+function tr:listen(ev, ...)
+	local names = {...}
+	if self.listeners[ev] == nil then self.listeners[ev] = {} end
+	for i, v in pairs(names) do
+		table.insert(self.listeners[ev], v)
+	end
+end
+
+-- Adds all of a node's events as listeners
+function tr:node_listen(name)
+	local n = self:find(name)
+	if n then
+		for i, v in pairs(n.value) do
+			if type(v) == "function" then
+				self:listen(i, name)
+			end
+		end 
+	end
+end
+
+-- Executes an event for every children that is listening
+function tr:event(name, ...)
+	if self.listeners[name] then
+		for i, v in pairs(self.listeners[name]) do
+			local f = self:find(v)
+			if f ~= nil then
+				if f.value[name] ~= nil then
+					f.value[name](f.value, ...)
+				end
+			end
+		end
+	end
+
+end
+
 -- Iterates all over a tree until finding a node with name n
 function tr:find(n)
-	print("finding: " .. n .. "," .. self.name)
 	if self.name == n then return self end
 	if not table.is_empty(self.children) then
 		for _, v in pairs(self.children) do
 			local nod = v:find(n)
 			if nod then return nod end
 		end
-		return {}
+		return nil
 	end
 end
 
@@ -54,16 +89,34 @@ function tr:set_value(n, v)
 	if type(self.value) == "table" then self.value[n] = v end
 end
 
+-- Orders the given node for event getting
+--[[function tr:order(name, ...)
+	local orders = {...}
+	local res_orders = {}
+	local arr_i = 0
+	table.insert(orders, 0, 1)
+	for i = 1, #orders/2 do
+		res_orders[i] = {}
+		res_orders[i][1] = orders[i*2]
+		res_orders[i][2] = orders[i*2+1]
+	end
+	self.orders[name] = res_orders
+end
+
+function tr:apply_order()
+
+end]]
+
 -- Creates a new tree
 function new_tree(name, n, fa)
-	print("new " .. tostring(name) .. "," .. tostring(n))
 	local t = {
 		children = {},
 		value = n or {},
 		name = name or "",
 		father = fa or {},
 		active = true,
-		visible = true
+		visible = true,
+		listeners = {}
 	}
 
 	setmetatable(t, {__index=tr})
