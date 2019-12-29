@@ -14,7 +14,6 @@ end
 
 -- Sets a new or old node as children
 function tr:set(name, n)
-	--print("set " .. tostring(name) .. "," .. tostring(n))
 	if type(name) == "string" then self.children[name] = new_tree(name, n, self) 
 	else self.children[name] = name  end
 
@@ -26,7 +25,7 @@ function tr:traverse(func, nx)
 	if not func(self, (nx or 0)) then
 		nx = (nx or 0) + 1 -- Level of recursion
 		for _, v in pairs(self.children) do
-			v:traverse(func, (nx or 0))
+      		v:traverse(func, (nx or 0))
 		end
 	end
 end
@@ -100,6 +99,19 @@ function tr:find(n)
 	end
 end
 
+-- Iterates all over a tree, returning the first node that fits with the
+-- function provided.
+function tr:find_func(func)
+	if func(self) then return self end
+	if not table.is_empty(self.children) then
+		for _, v in pairs(self.children) do
+			local nod = v:find_func(func)
+			if nod then return nod end
+		end
+		return nil
+	end
+end
+
 -- Gets a value from the value table
 function tr:get_value(n)
 	if type(self.value) == "table" then return self.value[n] end
@@ -137,7 +149,8 @@ function new_tree(name, n, fa)
 		father = fa or {},
 		active = true,
 		visible = true,
-		listeners = {}
+		listeners = {},
+		tag = ""
 	}
 
 	setmetatable(t, {__index=tr})

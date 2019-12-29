@@ -25,6 +25,7 @@ menu:set(player)]]
 
 function create_console()
 	local console = new_game_node("console")
+	console.tag = "console"
 	console:set_value("font", love.graphics.newFont("defont.ttf", 16))
 	console:set_value("def_font", love.graphics.getFont())
 	console:set_value("log", {})
@@ -45,12 +46,12 @@ function create_console()
 		end
 		if self.node.visible then
 			if key == "return" then
-				local status, err = pcall(
+				table.insert(self.log, "> " .. self.text)
+       			local status, err = pcall(
 					function() 
 						loadstring(self.text)()
 					end
 				)
-				table.insert(self.log, self.text)
 				if err then table.insert(self.log, err) end
 				self.text = ""
 			elseif key == "backspace" then
@@ -78,7 +79,7 @@ function create_console()
 			love.graphics.setColor(0.2, 0.2, 0.2, 0.75)
 			love.graphics.rectangle("fill", 0, 0, clipx(1), clipy(0.75))
 			love.graphics.setColor(1, 1, 1, 1)
-			love.graphics.print(self.text or "", 0, clipy(0.72))
+			love.graphics.print("> " .. (self.text or ""), 0, clipy(0.72))
 			local y = 0.68
 			for i = #self.log, 1, -1 do
 				local v = self.log[i]

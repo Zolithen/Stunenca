@@ -4,6 +4,9 @@ require "eng/tree"
 require "eng/game_state"
 require "eng/console"
 
+require "eng/gui/gui_element"
+require "eng/gui/button"
+
 scene = new_tree("scene")
 
 local menu = new_tree("menu")
@@ -15,6 +18,7 @@ end)
 --menu:set("title", {draw=function(self) love.graphics.print("sfa", 100, 100) end})
 
 local player = new_game_node("player")
+player.tag = "player"
 player:set_value("hello", true)
 
 player:add_event("update", function(self, dt)
@@ -44,6 +48,7 @@ fps_counter:add_event("draw", function(self)
 end)
 
 local console = create_console()
+console.visible = false
 
 local oldp = print
 
