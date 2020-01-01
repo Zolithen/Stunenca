@@ -1,4 +1,6 @@
 
+utf8 = require("utf8")
+
 require "cmath"
 require "eng/tree"
 require "eng/game_state"
@@ -9,7 +11,7 @@ require "eng/gui/button"
 
 scene = new_tree("scene")
 
-local menu = new_tree("menu")
+--[[local menu = new_tree("menu")
 
 local title = new_game_node("title")
 title:add_event("draw", function(self)
@@ -39,13 +41,11 @@ player:add_event("draw", function(self)
 	love.graphics.rectangle("fill",  self.x,  self.y, 16, 16)	
 end)
 
---[[scene:set(create_console()):order(
-	"console", "draw", -1, "keypressed", 1, "keyreleased", 1
-)]]
 local fps_counter = new_game_node("fps_counter")
 fps_counter:add_event("draw", function(self)
 	love.graphics.print("FPS: " .. love.timer.getFPS(), clipx(0.9), 0)
 end)
+fps_counter.tag = "player"
 
 local console = create_console()
 console.visible = false
@@ -56,7 +56,7 @@ function print(s, ...)
 	oldp(s, ...)
 	local ress = s
 	for i, v in pairs({...}) do
-		ress = ress .. " " .. v
+		ress = ress .. " " .. tostring(v)
 	end
 	table.insert(console.value.log, ress)
 end
@@ -66,25 +66,40 @@ scene:set(player)
 scene:set(title)
 scene:set(fps_counter)
 
-scene:node_listen("player")
-scene:node_listen("console")
-scene:node_listen("title")
-scene:node_listen("fps_counter")
+
+scene:node_listen("scene")
 
 scene:event_order("console", "draw", -1)
+--scene:event_order("fps_counter_renderer", "draw", -1)
 scene:event_order("fps_counter", "draw", -1)
 
---[[scene:listen("draw", "console", "player", "title")
-scene:listen("update", "console", "player")
-scene:listen("keypressed", "console")
-scene:listen("keyreleased", "console")
-scene:listen("textinput", "console")]]
+--print(scene:find("fps_counter"):find("renderer"))]]
 
---scene:apply_order()
+local console = create_console()
+console.visible = false
 
---scene:set(menu)
+local oldp = print
 
---print(scene:find("player"):get_value("hello"))
+function print(s, ...)
+	oldp(s, ...)
+	local ress = s
+	for i, v in pairs({...}) do
+		ress = ress .. " " .. tostring(v)
+	end
+	table.insert(console.value.log, ress)
+end
+
+scene:set(console)
+
+local button = new_gui_button("ye", function(self, mx, my, button) 
+	print("Button has been clicked")
+end, 0.1, 0.1, 0.8, 0.8)
+scene:set(button)
+scene:node_listen("ye")
+
+--[[for i, v in pairs(scene:find_func_all(function(self) return self.tag == "player" end)) do 
+	--print(i, v, v.name)
+end]]
 
 love.keyboard.setKeyRepeat(true)
 
@@ -113,7 +128,7 @@ function love.keyreleased(key)
 end
 
 function love.mousepressed(x, y, button)
-
+	scene:event("mousepressed", x, y, button)
 end
 
 function love.mousereleased(x, y, button)

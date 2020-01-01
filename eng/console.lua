@@ -26,17 +26,20 @@ menu:set(player)]]
 function create_console()
 	local console = new_game_node("console")
 	console.tag = "console"
-	console:set_value("font", love.graphics.newFont("defont.ttf", 16))
+	--console:set_value("font", love.graphics.newFont("defont.ttf", 16))
+	console:set_value("font", love.graphics.getFont())
 	console:set_value("def_font", love.graphics.getFont())
 	console:set_value("log", {})
+	console:set_value("text", "")
 
 	console:add_event("update", function(self, dt)
 
 	end)
 
 	console:add_event("textinput", function(self, text)
-		if self.node.visible then
-			self.text = (self.text or "") .. text
+		print(text)
+		if self.node.visible and text ~= "backspace" then
+			self.text = self.text .. text
 		end
 	end)
 
@@ -55,7 +58,10 @@ function create_console()
 				if err then table.insert(self.log, err) end
 				self.text = ""
 			elseif key == "backspace" then
-				self.text = self.text:sub(1, #self.text-1)
+				local byteoffset = utf8.offset(self.text, -1)
+				if byteoffset then
+					self.text = string.sub(self.text, 1, byteoffset - 1)
+				end
 			elseif key == "up" then
 				self.text = self.log[#self.log]
 			end
@@ -79,7 +85,8 @@ function create_console()
 			love.graphics.setColor(0.2, 0.2, 0.2, 0.75)
 			love.graphics.rectangle("fill", 0, 0, clipx(1), clipy(0.75))
 			love.graphics.setColor(1, 1, 1, 1)
-			love.graphics.print("> " .. (self.text or ""), 0, clipy(0.72))
+			--print(self.text)
+			love.graphics.print("> " .. self.text, 0, math.floor(clipy(0.72)))
 			local y = 0.68
 			for i = #self.log, 1, -1 do
 				local v = self.log[i]

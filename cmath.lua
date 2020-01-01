@@ -233,7 +233,21 @@ function table.is_empty(t)
   return next(t) == nil
 end
 
-function math.point(point, box) return ((point.x > box.x) and (point.x < box.x + box.w)) and ((point.y > box.y) and (point.y < box.y + box.h)) end
+function math.pointraw(x1, y1, x2, y2, w, h) 
+  return (
+    (x1 > x2) and
+    (x1 < x2 + w) and
+    (y1 > y2) and
+    (y1 < y2 + h)
+  )
+end
+function math.point(point, box) 
+  return 
+  ((point.x > box.x) and 
+  (point.x < box.x + box.w)) and 
+  ((point.y > box.y) and 
+  (point.y < box.y + box.h)) 
+end
 function math.boverlap(b1, b2)
   return b1.x < b2.x+b2.w and
          b2.x < b1.x+b1.w and

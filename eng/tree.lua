@@ -44,22 +44,30 @@ function tr:node_listen(name)
 	local n = self:find(name)
 	if n then
 		for i, v in pairs(n.value) do
-			if type(v) == "function" then
+			if type(v) == "function" then -- iterate all over the functions
 				self:listen(i, name)
 			end
 		end 
 	end
 end
 
+-- Executes an event for an specific node
+function tr:event_raw(name, node, ...)
+	if node.value[name] ~= nil then node.value[name](node.value, ...) end
+	if not table.is_empty(node.children) then
+		for i, v in pairs(node.children) do -- calls the event for every children
+			self:event_raw(name, v, ...)
+		end
+	end
+end
+
 -- Executes an event for every children that is listening
 function tr:event(name, ...)
 	if self.listeners[name] then
-		for i, v in pairs(self.listeners[name]) do
+		for i, v in pairs(self.listeners[name]) do -- calls the event for every listener
 			local f = self:find(v)
 			if f ~= nil then
-				if f.value[name] ~= nil then
-					f.value[name](f.value, ...)
-				end
+				self:event_raw(name, f, ...)
 			end
 		end
 	end
@@ -69,20 +77,28 @@ end
 -- Reorders the listeners
 function tr:event_order(name, event, order)
 	if self.listeners[event] ~= nil then
-		if order == -1 then
+		if order == -1 then -- negative order
 			local temps = table.copy(self.listeners[event])
-			for i, v in pairs(temps) do print(i, v) end
+			local list_set = Set(temps) -- creates a set from the listeners
+			local res = {}
+			for i, v in pairs(temps) do
+				if not (i == list_set[name]) then -- if the name is on listeners
+					table.insert(res, v)
+				end
+			end
+			table.insert(res, name) -- inserts the given name into the listeners
+			self.listeners[event] = table.copy(res) 
+		else -- positive order
+			local temps = table.copy(self.listeners[event])
 			local list_set = Set(temps)
 			local res = {}
-			print(list_set[name])
 			for i, v in pairs(temps) do
-				print(i, v, list_set[name])
 				if not (i == list_set[name]) then
 					table.insert(res, v)
 				end
 			end
-			table.insert(res, name)
-			self.listeners[event] = table.copy(res)
+			--table.insert(res, name)
+			--self.listeners[event] = table.copy(res)
 		end
 	end
 end
@@ -112,6 +128,17 @@ function tr:find_func(func)
 	end
 end
 
+-- Iterates all over a tree, returning every node that fits with the
+-- function provided
+function tr:find_func_all(func, ntt)
+	local nt = ntt or {}
+	if func(self) then table.insert(nt, self) end
+	for i, v in pairs(self.children) do
+		v:find_func_all(func, nt)
+	end
+	return nt
+end
+
 -- Gets a value from the value table
 function tr:get_value(n)
 	if type(self.value) == "table" then return self.value[n] end
@@ -122,29 +149,21 @@ function tr:set_value(n, v)
 	if type(self.value) == "table" then self.value[n] = v end
 end
 
--- Orders the given node for event getting
---[[function tr:order(name, ...)
-	local orders = {...}
-	local res_orders = {}
-	local arr_i = 0
-	table.insert(orders, 0, 1)
-	for i = 1, #orders/2 do
-		res_orders[i] = {}
-		res_orders[i][1] = orders[i*2]
-		res_orders[i][2] = orders[i*2+1]
-	end
-	self.orders[name] = res_orders
-end
-
-function tr:apply_order()
-
-end]]
-
 -- Creates a new tree
 function new_tree(name, n, fa)
+	local val = n or {}
+	val.draw = function() end
+	val.update = function(dt) end
+	val.keypressed = function(key, scancode, isrepeat) end
+	val.keyreleased = function(key, scancode) end
+	val.mousepressed = function(x, y, button, presses) end
+	val.mousereleased = function(x, y, button, presses) end
+	val.textinput = function(text) end
+	val.draw = function() end
+
 	local t = {
 		children = {},
-		value = n or {},
+		value = val,
 		name = name or "",
 		father = fa or {},
 		active = true,
