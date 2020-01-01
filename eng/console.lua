@@ -37,7 +37,7 @@ function create_console()
 	end)
 
 	console:add_event("textinput", function(self, text)
-		print(text)
+		--print(text)
 		if self.node.visible and text ~= "backspace" then
 			self.text = self.text .. text
 		end

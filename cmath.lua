@@ -262,3 +262,9 @@ function Set (list)
   end
   return set
 end
+
+function array_change(arr, i, v)
+  local t = table.copy(arr)
+  arr[i] = v
+  return arr
+end

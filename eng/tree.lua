@@ -160,6 +160,7 @@ function new_tree(name, n, fa)
 	val.mousereleased = function(x, y, button, presses) end
 	val.textinput = function(text) end
 	val.draw = function() end
+	val.wheelmoved = function() end
 
 	local t = {
 		children = {},

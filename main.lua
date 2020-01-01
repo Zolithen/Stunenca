@@ -4,12 +4,14 @@ utf8 = require("utf8")
 require "cmath"
 require "eng/tree"
 require "eng/game_state"
+
+scene = new_tree("scene")
+
 require "eng/console"
 
 require "eng/gui/gui_element"
 require "eng/gui/button"
-
-scene = new_tree("scene")
+require "eng/gui/list"
 
 --[[local menu = new_tree("menu")
 
@@ -75,6 +77,9 @@ scene:event_order("fps_counter", "draw", -1)
 
 --print(scene:find("fps_counter"):find("renderer"))]]
 
+local gui_layer = new_game_node("gui_layer")
+gui_layer:set_value("color", {0.1, 0.1, 0.1, 1})
+
 local console = create_console()
 console.visible = false
 
@@ -90,13 +95,24 @@ function print(s, ...)
 end
 
 scene:set(console)
+scene:node_listen("console")
 
-local button = new_gui_button("ye", function(self, mx, my, button) 
+--[[local button = new_gui_button("ye", function(self, mx, my, button) 
 	print("Button has been clicked")
-end, 0.1, 0.1, 0.8, 0.8)
-scene:set(button)
-scene:node_listen("ye")
+end, 0.1, 0.1, 0.8, 0.8, "fjskahk")]]
 
+local panel = new_gui_element("panel", 0.1, 0.1, 0.8, 0.8)
+
+local list = new_gui_list("perk_list", 0.1, 0.1, 0.2, 0.5, {"Assasin", "Damage Boost", "Dash"})
+
+--gui_layer:set(button)
+gui_layer:set(panel)
+gui_layer:set(list)
+scene:set(gui_layer)
+scene:node_listen("gui_layer")
+
+scene:event_order("perk_list", "draw", -1)
+scene:event_order("console", "draw", -1)
 --[[for i, v in pairs(scene:find_func_all(function(self) return self.tag == "player" end)) do 
 	--print(i, v, v.name)
 end]]
@@ -129,6 +145,11 @@ end
 
 function love.mousepressed(x, y, button)
 	scene:event("mousepressed", x, y, button)
+end
+
+
+function love.wheelmoved(x, y)
+	scene:event("wheelmoved", x, y)
 end
 
 function love.mousereleased(x, y, button)
