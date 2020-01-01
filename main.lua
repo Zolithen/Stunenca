@@ -87,7 +87,7 @@ local oldp = print
 
 function print(s, ...)
 	oldp(s, ...)
-	local ress = s
+	local ress = tostring(s)
 	for i, v in pairs({...}) do
 		ress = ress .. " " .. tostring(v)
 	end
@@ -105,13 +105,18 @@ local panel = new_gui_element("panel", 0.1, 0.1, 0.8, 0.8)
 
 local list = new_gui_list("perk_list", 0.1, 0.1, 0.2, 0.5, {"Assasin", "Damage Boost", "Dash"})
 
+local remove_button = new_gui_button("remove_button", function(self, x, y, button)
+	table.remove(list.value.li, list.value.selected)
+end, 0.1, 0.6, 0.07, 0.1, "Remove")
+
 --gui_layer:set(button)
-gui_layer:set(panel)
 gui_layer:set(list)
+gui_layer:set(panel)
+gui_layer:set(remove_button)
 scene:set(gui_layer)
 scene:node_listen("gui_layer")
 
-scene:event_order("perk_list", "draw", -1)
+gui_layer:event_order("panel", "draw", 1)
 scene:event_order("console", "draw", -1)
 --[[for i, v in pairs(scene:find_func_all(function(self) return self.tag == "player" end)) do 
 	--print(i, v, v.name)

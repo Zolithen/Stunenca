@@ -62,7 +62,8 @@ function new_gui_list(name, x, y, w, h, l)
 		local my = y/hh
 
 		if math.pointraw(mx, my, self.x, self.y, self.w, self.h) then
-
+			local mmy = y + self.ty - self.y*hh
+			self.selected = math.floor(mmy / 16)+1
 		end
 
 	end)

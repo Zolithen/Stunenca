@@ -15,7 +15,7 @@ end
 -- Sets a new or old node as children
 function tr:set(name, n)
 	if type(name) == "string" then self.children[name] = new_tree(name, n, self) 
-	else self.children[name] = name  end
+	else self.children[name.name] = name  end
 
 	return self
 end
@@ -39,26 +39,47 @@ function tr:listen(ev, ...)
 	end
 end
 
+function tr:node_listen_raw(n)
+	if n then
+		for i, v in pairs(n.value) do
+			if type(v) == "function" then -- iterate all over the functions
+				self:listen(i, n.name)
+			end
+		end
+		if n.children then
+			for i, v in pairs(n.children) do
+				print(i, v)
+				n:node_listen(i)
+			end
+		end
+	end
+end
+
 -- Adds all of a node's events as listeners
 function tr:node_listen(name)
 	local n = self:find(name)
-	if n then
+	--[[if n then
 		for i, v in pairs(n.value) do
 			if type(v) == "function" then -- iterate all over the functions
 				self:listen(i, name)
 			end
-		end 
-	end
+		end
+	end]]
+	self:node_listen_raw(n)
 end
 
 -- Executes an event for an specific node
 function tr:event_raw(name, node, ...)
 	if node.value[name] ~= nil then node.value[name](node.value, ...) end
-	if not table.is_empty(node.children) then
+	--[[if not table.is_empty(node.children) then
 		for i, v in pairs(node.children) do -- calls the event for every children
 			self:event_raw(name, v, ...)
 		end
+	end]]
+	if node.listeners[name] then
+		node:event(name, ...)
 	end
+	--if node.listeners[name] then node:event(name, ...) end
 end
 
 -- Executes an event for every children that is listening
@@ -66,6 +87,7 @@ function tr:event(name, ...)
 	if self.listeners[name] then
 		for i, v in pairs(self.listeners[name]) do -- calls the event for every listener
 			local f = self:find(v)
+			--print("executing event for: ", v, f)
 			if f ~= nil then
 				self:event_raw(name, f, ...)
 			end
@@ -87,18 +109,24 @@ function tr:event_order(name, event, order)
 				end
 			end
 			table.insert(res, name) -- inserts the given name into the listeners
-			self.listeners[event] = table.copy(res) 
-		else -- positive order
+			self.listeners[event] = table.copy(res)
+		elseif order == 1 then
+			print("fdsafasf")
 			local temps = table.copy(self.listeners[event])
-			local list_set = Set(temps)
+			local list_set = Set(temps) -- creates a set from the listeners
 			local res = {}
+			table.insert(res, name) -- inserts the given name into the listeners
 			for i, v in pairs(temps) do
-				if not (i == list_set[name]) then
+				if not (i == list_set[name]) then -- if the name is on listeners
 					table.insert(res, v)
 				end
 			end
-			--table.insert(res, name)
-			--self.listeners[event] = table.copy(res)
+
+			for i, v in pairs(res) do
+				print(i, v)
+			end
+
+			self.listeners[event] = table.copy(res)
 		end
 	end
 end
@@ -169,7 +197,7 @@ function new_tree(name, n, fa)
 		father = fa or {},
 		active = true,
 		visible = true,
-		listeners = {},
+		listeners = {draw={}},
 		tag = ""
 	}
 
