@@ -77,8 +77,8 @@ scene:event_order("fps_counter", "draw", -1)
 
 --print(scene:find("fps_counter"):find("renderer"))]]
 
-local gui_layer = new_game_node("gui_layer")
-gui_layer:set_value("color", {0.1, 0.1, 0.1, 1})
+--[[local gui_layer = new_game_node("gui_layer")
+gui_layer:set_value("color", {0.1, 0.1, 0.1, 1})]]
 
 local console = create_console()
 console.visible = false
@@ -94,14 +94,44 @@ function print(s, ...)
 	table.insert(console.value.log, ress)
 end
 
+local player = new_game_node("player")
+player:set_value("interactable", 1)
+player:add_event("draw", function(self)
+	love.graphics.rectangle("fill", self.x, self.y, 16, 16)
+end)
+
+local enemy = new_game_node("enemy", 100, 100)
+enemy:set_value("interactable", 1)
+enemy:add_event("draw", function(self)
+	love.graphics.rectangle("fill", self.x, self.y, 16, 16)
+end)
+
 scene:set(console)
+scene:set(player)
+scene:set(enemy)
+scene:node_listen("player")
+scene:node_listen("enemy")
 scene:node_listen("console")
+
+print("interactable")
+for i, v in pairs(scene:find_func_all(function(self)
+	return self.value.interactable ~= nil
+end)) do
+	print(i, v, v.name)
+end
+
+print("non interactable")
+for i, v in pairs(scene:find_func_all(function(self)
+	return self.value.interactable == nil
+end)) do
+	print(i, v, v.name)
+end
 
 --[[local button = new_gui_button("ye", function(self, mx, my, button) 
 	print("Button has been clicked")
 end, 0.1, 0.1, 0.8, 0.8, "fjskahk")]]
 
-local panel = new_gui_element("panel", 0.1, 0.1, 0.8, 0.8)
+--[[local panel = new_gui_element("panel", 0.1, 0.1, 0.8, 0.8)
 
 local list = new_gui_list("perk_list", 0.1, 0.1, 0.2, 0.5, {"Assasin", "Damage Boost", "Dash"})
 
@@ -117,7 +147,7 @@ scene:set(gui_layer)
 scene:node_listen("gui_layer")
 
 gui_layer:event_order("panel", "draw", 1)
-scene:event_order("console", "draw", -1)
+scene:event_order("console", "draw", -1)]]
 --[[for i, v in pairs(scene:find_func_all(function(self) return self.tag == "player" end)) do 
 	--print(i, v, v.name)
 end]]

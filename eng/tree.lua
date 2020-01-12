@@ -15,7 +15,7 @@ end
 -- Sets a new or old node as children
 function tr:set(name, n)
 	if type(name) == "string" then self.children[name] = new_tree(name, n, self) 
-	else self.children[name.name] = name  end
+	else self.children[name.name] = name; name.father = self end
 
 	return self
 end
@@ -159,12 +159,20 @@ end
 -- Iterates all over a tree, returning every node that fits with the
 -- function provided
 function tr:find_func_all(func, ntt)
-	local nt = ntt or {}
+	ntt = ntt or {}
+	if func(self) then 
+		table.insert(ntt, self)
+	end
+	for i, v in pairs(self.children) do
+		ntt = v:find_func_all(func, ntt)
+	end
+	return ntt
+	--[[local nt = ntt or {}
 	if func(self) then table.insert(nt, self) end
 	for i, v in pairs(self.children) do
 		v:find_func_all(func, nt)
 	end
-	return nt
+	return nt]]
 end
 
 -- Gets a value from the value table
@@ -222,11 +230,11 @@ gn.__index = gn_index
 	if t.value then t.value[k] = v end
 end]]
 
-function new_game_node(name, fa)
+function new_game_node(name, x, y)
 	local t = new_tree(name, {
-		x = 0,
-		y = 0
-	}, fa)
+		x = x or 0,
+		y = y or 0
+	})
 	setmetatable(t, gn)
 	setmetatable(t.value, gnv)
 	t.value.node = t
