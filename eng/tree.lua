@@ -17,6 +17,8 @@ function tr:set(name, n)
 	if type(name) == "string" then self.children[name] = new_tree(name, n, self) 
 	else self.children[name.name] = name; name.father = self end
 
+	print(name.name)
+
 	return self
 end
 
@@ -85,15 +87,26 @@ end
 -- Executes an event for every children that is listening
 function tr:event(name, ...)
 	if self.listeners[name] then
-		for i, v in pairs(self.listeners[name]) do -- calls the event for every listener
+		for i, v in ipairs(self.listeners[name]) do -- calls the event for every listener
 			local f = self:find(v)
-			--print("executing event for: ", v, f)
 			if f ~= nil then
 				self:event_raw(name, f, ...)
 			end
 		end
 	end
 
+end
+
+-- Executes an event for every children that is listening
+function tr:event_reverse(name, ...)
+	if self.listeners[name] then
+		for i, v in r_ipairs(self.listeners[name]) do -- calls the event for every listener
+			local f = self:find(v)
+			if f ~= nil then
+				self:event_raw(name, f, ...)
+			end
+		end
+	end
 end
 
 -- Reorders the listeners

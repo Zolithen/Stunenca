@@ -1,0 +1,57 @@
+
+
+
+Z Order 
+Being able to change the order an object is drawn (gets events?)
+
+Prototypes for objects (for memory saving)?
+Easy to use dynamic objects
+
+Grouping up objects
+Easy access to every object
+
+Node based system:
+	Z Order issues
+	Less performance for Z order
+
+	-> Layering solves all of this
+
+
+
+NO:
+	Lists of objects 
+	ECS
+
+
+
+--
+
+
+object:
+	z = 0
+
+
+--
+
+
+--
+
+
+-- Solving z order with this maybe xd
+function draw() 
+	renderer.send(
+		"rectangle", {x = 0, y = 0, w = 16, h = 16}, 0
+	)
+
+	--lg.rectange("fill", 0, 0, 16, 16)
+
+end
+
+
+--
+
+--
+
+
+
+--

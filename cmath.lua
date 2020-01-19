@@ -268,3 +268,15 @@ function array_change(arr, i, v)
   arr[i] = v
   return arr
 end
+
+local function reversedipairsiter(t, i)
+    i = i - 1
+    if i ~= 0 then
+        return i, t[i]
+    end
+end
+function r_ipairs(t)
+    return reversedipairsiter, t, #t + 1
+end
+
+getmetatable('').__index = function(str,i) return string.sub(str,i,i) end

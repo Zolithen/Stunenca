@@ -63,7 +63,17 @@ function create_console()
 					self.text = string.sub(self.text, 1, byteoffset - 1)
 				end
 			elseif key == "up" then
-				self.text = self.log[#self.log]
+				local n_found = true
+				local it = 1
+				while n_found do
+					local textt = self.log[it]
+					if textt[1] == ">" then
+						--self.text = self.log[it]:gsub(">", "")
+						n_found = false
+					else
+						it = it + 1
+					end
+				end
 			end
 			block_keys()
 		else

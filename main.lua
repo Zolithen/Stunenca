@@ -80,6 +80,17 @@ scene:event_order("fps_counter", "draw", -1)
 --[[local gui_layer = new_game_node("gui_layer")
 gui_layer:set_value("color", {0.1, 0.1, 0.1, 1})]]
 
+--[[MAX_LAYERS = 10
+
+for i = 0, MAX_LAYERS do
+	local layer = new_game_node("layer" .. i, 0, 0)
+	scene:set(layer)
+	scene:node_listen("layer" .. i)
+end
+
+layer0 = scene:find("layer0")
+layer1 = scene:find("layer1")
+
 local console = create_console()
 console.visible = false
 
@@ -106,14 +117,14 @@ enemy:add_event("draw", function(self)
 	love.graphics.rectangle("fill", self.x, self.y, 16, 16)
 end)
 
-scene:set(console)
-scene:set(player)
-scene:set(enemy)
-scene:node_listen("player")
-scene:node_listen("enemy")
-scene:node_listen("console")
+layer1:set(console)
+layer0:set(player)
+layer0:set(enemy)
+layer0:node_listen("player")
+layer0:node_listen("enemy")
+layer1:node_listen("console")]]
 
-print("interactable")
+--[[print("interactable")
 for i, v in pairs(scene:find_func_all(function(self)
 	return self.value.interactable ~= nil
 end)) do
@@ -125,7 +136,7 @@ for i, v in pairs(scene:find_func_all(function(self)
 	return self.value.interactable == nil
 end)) do
 	print(i, v, v.name)
-end
+end]]
 
 --[[local button = new_gui_button("ye", function(self, mx, my, button) 
 	print("Button has been clicked")
@@ -152,6 +163,26 @@ scene:event_order("console", "draw", -1)]]
 	--print(i, v, v.name)
 end]]
 
+MAX_LAYERS = 10
+
+layers = {}
+
+for i = 0, MAX_LAYERS do
+	layers[i] = new_game_node("layer" .. i, 0, 0)
+	scene:set(layers[i])
+	--scene:node_listen("layer" .. i)
+	scene:node_listen("layer" .. i)
+end
+
+local player = new_game_node("player")
+player:set_value("interactable", 1)
+player:add_event("draw", function(self)
+	love.graphics.rectangle("fill", self.x, self.y, 16, 16)
+end)
+
+layers[0]:set(player)
+layers[0]:node_listen("player")
+
 love.keyboard.setKeyRepeat(true)
 
 function love.load()
@@ -159,7 +190,7 @@ function love.load()
 end
 
 function love.update(dt)
-	scene:event("update", dt)
+	scene:event_reverse("update", dt)
 end
 
 function love.draw()
@@ -167,24 +198,24 @@ function love.draw()
 end
 
 function love.textinput(text)
-	scene:event("textinput", text)
+	scene:event_reverse("textinput", text)
 end
 
 function love.keypressed(key)
-	scene:event("keypressed", key)
+	scene:event_reverse("keypressed", key)
 end
 
 function love.keyreleased(key)
-
+	scene:event_reverse("keyreleased", key)
 end
 
 function love.mousepressed(x, y, button)
-	scene:event("mousepressed", x, y, button)
+	scene:event_reverse("mousepressed", x, y, button)
 end
 
 
 function love.wheelmoved(x, y)
-	scene:event("wheelmoved", x, y)
+	scene:event_reverse("wheelmoved", x, y)
 end
 
 function love.mousereleased(x, y, button)
