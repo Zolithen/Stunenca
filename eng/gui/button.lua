@@ -1,42 +1,44 @@
 
-function new_gui_button(name, func, x, y, w, h, label)
-	local button = new_gui_element(name, x, y, w, h)
-	button:set_value("prototype", table.copy(button.value))
 
-	button:set_value("on_click", func)
-	button:set_value("text", 
-		love.graphics.newText(love.graphics.getFont(), label or "")
-	)
+function new_button(parent, name, x, y, w, h, on_click, text)
+	local b = gui_element(parent, name);
 
-	--button:add_event("mousepressed")
+	b.x, b.y, b.w, b.h, b.on_click = x or 0, y or 0, w or 0, h or 0, on_click or function() end;
 
-	button:add_event("draw", function(self)
-		local ww, hh = love.graphics.getWidth(), love.graphics.getHeight()
+	b.text = love.graphics.newText(love.graphics.getFont(), text or "");
+
+	b.draw = function(self)
+		--print(self.x)
+		local ww, hh = lg.getWidth(), lg.getHeight();
 		local mx = love.mouse.getX()/ww
 		local my = love.mouse.getY()/hh
-		if math.pointraw(mx, my, self.x, self.y, self.w, self.h) then
+		--print("button node has a pos of", self:get_x(), self:get_y());
+		if math.pointraw(mx, my, self:get_x(), self:get_y(), self.w, self.h) then
 			love.graphics.setColor(
 				0.4, 0.4, 0.4, 1
 			)
 		else
-			love.graphics.setColor(scene:find("gui_layer").value.color)
+			love.graphics.setColor(0.1, 0.1, 0.1, 1);
 		end
-		love.graphics.rectangle("fill", self.x*ww, self.y*hh, self.w*ww, self.h*hh)
-		love.graphics.setColor(1, 1, 1, 1)
+		love.graphics.rectangle("fill",self.x*ww, self.y*hh, self.w*ww, self.h*hh);
+		love.graphics.setColor(1, 1, 1, 1);
 		love.graphics.draw(self.text, 
 			self.x*ww+(self.w*ww-(self.w*ww/2))-self.text:getWidth()/2, 
 			self.y*hh+(self.h*hh-(self.h*hh/2))-self.text:getHeight()/2
 		)
-	end)
+	end
 
-	button:add_event("mousepressed", function(self, x, y, button)
-		local ww, hh = love.graphics.getWidth(), love.graphics.getHeight()
+	b.mousepressed = function(self, x, y, button)
+		local ww, hh = lg.getWidth(), lg.getHeight();
 		local mx = x/ww
 		local my = y/hh
-		if math.pointraw(mx, my, self.x, self.y, self.w, self.h) then
+		if math.pointraw(mx, my, self:get_x(), self:get_y(), self.w, self.h) then
+			--print("got into")
 			self:on_click(mx, my, button)
+			return true;
+			--print("spñíkfghbasñoukfvbsalifkhjsba flkasjvf ask,jmfsabfklsajbfkln.sabf dsafk,asnv faslkj,hf");
 		end
-	end)
+	end
 
-	return button
+	return b;
 end

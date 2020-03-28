@@ -1,3 +1,9 @@
+
+_G.RANDSED = os.time()
+math.randomseed(_G.RANDSED)
+function resseed()
+  math.randomseed(_G.RANDSED)
+end
 math.angleBetween2Points = function(a, b)
 	--[[var p1 = {
 	x: 20,
@@ -21,12 +27,15 @@ end
 
 -- Generates an UUID
 local random = math.random
-function math.uuid()
+function math.uuid(sed)
+    math.randomseed(sed or _G.RANDSED)
     local template ='xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'
-    return string.gsub(template, '[xy]', function (c)
+    local st = string.gsub(template, '[xy]', function (c)
         local v = (c == 'x') and random(0, 0xf) or random(8, 0xb)
         return string.format('%x', v)
     end)
+    resseed()
+    return st
 end
 
 math.stack = {}

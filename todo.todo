@@ -1,24 +1,2 @@
--5 Main Engine Thingies
-	-5 MAKE EVERYTHING SERVER-CLIENT FRIENDLY + MULTIPLATFORM
-	-4 Sending LÖVE events in the engine
-	-3 Screen Space GUI system
-	-5 Architecture system
-	-3 In-game developer console system
-		-2 Polishing
-	-2 State machine
-	-1 Animation system
-	-2 Camera system
-	-2 Serialization
-	-2 Timer system
-	-2 Log system
-	-1 Compression for Zariel projects (zlib if possible)
-
--5 The architecture of the Engine
-	+-2 The engine is structured like a tree.
-	+-2 Every node has its value, children, name and father.
-	+-2 The special node "game_node" is the basic building block.
-	-3 Finish event order
-	-2 Reference arrays/trees
-
--4 The GUI system
+-2 Make nodes in node_tree_viewer selectable.
 	

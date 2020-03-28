@@ -1,223 +1,104 @@
-
-utf8 = require("utf8")
-
-require "cmath"
 require "eng/tree"
-require "eng/game_state"
-
-scene = new_tree("scene")
-
-require "eng/console"
 
 require "eng/gui/gui_element"
 require "eng/gui/button"
-require "eng/gui/list"
+require "eng/gui/list/list"
+require "eng/gui/list/text_element_list"
+require "eng/gui/node_tree_viewer"
 
---[[local menu = new_tree("menu")
+function create_scene()
+	local sscene = new_node(nil, "root");
 
-local title = new_game_node("title")
-title:add_event("draw", function(self)
-	love.graphics.print("sfa", 100, 100)
-end)
---menu:set("title", {draw=function(self) love.graphics.print("sfa", 100, 100) end})
+	-- Declaring childrens of nodes
+	--scene:add(new_node());
 
-local player = new_game_node("player")
-player.tag = "player"
-player:set_value("hello", true)
+	local player = new_node(sscene, "player");
+	--local sea = new_node();
+	
+	--[[sea.draw = function(self)
+		love.graphics.setColor(0, 0, 1, 1);
+		love.graphics.rectangle("fill", 0, 0, 200, 200)
+		love.graphics.setColor(1, 1, 1, 1);
+		sscene:propagate_event("p", "aogklshna");
+		--return true;
+	end]]
 
-player:add_event("update", function(self, dt)
-	if love.keyboard.isDown("w") then
-		self.y = self.y - 3
+	player.draw = function(self)
+		love.graphics.rectangle("fill", self.x, self.y, 16, 16)
 	end
-	if love.keyboard.isDown("s") then
-		self.y = self.y + 3
-	end
-	if love.keyboard.isDown("a") then
-		self.x = self.x - 3
-	end
-	if love.keyboard.isDown("d") then
-		self.x = self.x + 3
-	end
-end)
-player:add_event("draw", function(self)
-	love.graphics.rectangle("fill",  self.x,  self.y, 16, 16)	
-end)
 
-local fps_counter = new_game_node("fps_counter")
-fps_counter:add_event("draw", function(self)
-	love.graphics.print("FPS: " .. love.timer.getFPS(), clipx(0.9), 0)
-end)
-fps_counter.tag = "player"
-
-local console = create_console()
-console.visible = false
-
-local oldp = print
-
-function print(s, ...)
-	oldp(s, ...)
-	local ress = s
-	for i, v in pairs({...}) do
-		ress = ress .. " " .. tostring(v)
+	player.update = function(self, dt)
+		if love.keyboard.isDown("a") then 
+			self.x = self.x - 3;
+		end
+		if love.keyboard.isDown("d") then 
+			self.x = self.x + 3;
+		end
+		if love.keyboard.isDown("s") then 
+			self.y = self.y + 3;
+		end
+		if love.keyboard.isDown("w") then 
+			self.y = self.y - 3;
+		end
 	end
-	table.insert(console.value.log, ress)
+
+	player.p = function(self, s)
+		print(s)
+	end
+
+	--local b = new_button(sscene, "button_hola", 0, 0, 0.1, 0.1, function() print("hola") end, "hola");
+
+	local li = new_list(sscene, "normal_list", 0.0, 0.2, 0.2, 0.2);
+
+	new_button(li, "button_in", 0, 0, 0.1, 0.1, function() print("holas") end, "holas");
+
+	local si = new_text_element_list(sscene, "textel_list", 0.0, 0.0, 0.2, 0.2);
+
+	for i = 1, 1000 do
+		si:add_text("text" .. i);
+	end
+
+	local ntw = new_node_tree_viewer(sscene, "tree_viewer", 0.2, 0.2, 0.2, 0.2, scene);
+
+	local enemy_holder = new_node(sscene, "enemy__holder");
+
+	for i = 1, 1000 do
+		local e = new_node(enemy_holder, "enemy");
+		e.ind = i;
+		e.draw = function(self)
+			--lg.rectangle("fill", i*4, i*4, 16, 16);
+		end
+	end
+
+	return sscene
 end
 
-scene:set(console)
-scene:set(player)
-scene:set(title)
-scene:set(fps_counter)
+scene = create_scene();
 
+--[[sea.ff = true;
+player.dd = true;
 
-scene:node_listen("scene")
+print(scene:find(function(n) return n.ff end)[1])]]
 
-scene:event_order("console", "draw", -1)
---scene:event_order("fps_counter_renderer", "draw", -1)
-scene:event_order("fps_counter", "draw", -1)
-
---print(scene:find("fps_counter"):find("renderer"))]]
-
---[[local gui_layer = new_game_node("gui_layer")
-gui_layer:set_value("color", {0.1, 0.1, 0.1, 1})]]
-
---[[MAX_LAYERS = 10
-
-for i = 0, MAX_LAYERS do
-	local layer = new_game_node("layer" .. i, 0, 0)
-	scene:set(layer)
-	scene:node_listen("layer" .. i)
-end
-
-layer0 = scene:find("layer0")
-layer1 = scene:find("layer1")
-
-local console = create_console()
-console.visible = false
-
-local oldp = print
-
-function print(s, ...)
-	oldp(s, ...)
-	local ress = tostring(s)
-	for i, v in pairs({...}) do
-		ress = ress .. " " .. tostring(v)
-	end
-	table.insert(console.value.log, ress)
-end
-
-local player = new_game_node("player")
-player:set_value("interactable", 1)
-player:add_event("draw", function(self)
-	love.graphics.rectangle("fill", self.x, self.y, 16, 16)
-end)
-
-local enemy = new_game_node("enemy", 100, 100)
-enemy:set_value("interactable", 1)
-enemy:add_event("draw", function(self)
-	love.graphics.rectangle("fill", self.x, self.y, 16, 16)
-end)
-
-layer1:set(console)
-layer0:set(player)
-layer0:set(enemy)
-layer0:node_listen("player")
-layer0:node_listen("enemy")
-layer1:node_listen("console")]]
-
---[[print("interactable")
-for i, v in pairs(scene:find_func_all(function(self)
-	return self.value.interactable ~= nil
-end)) do
-	print(i, v, v.name)
-end
-
-print("non interactable")
-for i, v in pairs(scene:find_func_all(function(self)
-	return self.value.interactable == nil
-end)) do
-	print(i, v, v.name)
-end]]
-
---[[local button = new_gui_button("ye", function(self, mx, my, button) 
-	print("Button has been clicked")
-end, 0.1, 0.1, 0.8, 0.8, "fjskahk")]]
-
---[[local panel = new_gui_element("panel", 0.1, 0.1, 0.8, 0.8)
-
-local list = new_gui_list("perk_list", 0.1, 0.1, 0.2, 0.5, {"Assasin", "Damage Boost", "Dash"})
-
-local remove_button = new_gui_button("remove_button", function(self, x, y, button)
-	table.remove(list.value.li, list.value.selected)
-end, 0.1, 0.6, 0.07, 0.1, "Remove")
-
---gui_layer:set(button)
-gui_layer:set(list)
-gui_layer:set(panel)
-gui_layer:set(remove_button)
-scene:set(gui_layer)
-scene:node_listen("gui_layer")
-
-gui_layer:event_order("panel", "draw", 1)
-scene:event_order("console", "draw", -1)]]
---[[for i, v in pairs(scene:find_func_all(function(self) return self.tag == "player" end)) do 
-	--print(i, v, v.name)
-end]]
-
-MAX_LAYERS = 10
-
-layers = {}
-
-for i = 0, MAX_LAYERS do
-	layers[i] = new_game_node("layer" .. i, 0, 0)
-	scene:set(layers[i])
-	--scene:node_listen("layer" .. i)
-	scene:node_listen("layer" .. i)
-end
-
-local player = new_game_node("player")
-player:set_value("interactable", 1)
-player:add_event("draw", function(self)
-	love.graphics.rectangle("fill", self.x, self.y, 16, 16)
-end)
-
-layers[0]:set(player)
-layers[0]:node_listen("player")
-
-love.keyboard.setKeyRepeat(true)
-
-function love.load()
-
+function love.draw()
+	scene:propagate_event("draw")
 end
 
 function love.update(dt)
-	scene:event_reverse("update", dt)
-end
-
-function love.draw()
-	scene:event("draw")
-end
-
-function love.textinput(text)
-	scene:event_reverse("textinput", text)
-end
-
-function love.keypressed(key)
-	scene:event_reverse("keypressed", key)
-end
-
-function love.keyreleased(key)
-	scene:event_reverse("keyreleased", key)
+	scene:propagate_event("update", dt)
 end
 
 function love.mousepressed(x, y, button)
-	scene:event_reverse("mousepressed", x, y, button)
+	scene:propagate_event("mousepressed", x, y, button);
 end
 
-
-function love.wheelmoved(x, y)
-	scene:event_reverse("wheelmoved", x, y)
+function love.wheelmoved(dx, dy)
+	scene:propagate_event("wheelmoved", dx, dy);
 end
 
-function love.mousereleased(x, y, button)
-
-end
+--[[
+	Structure of a node:
+		- Parent
+		- Value
+		- Metatable
+]]

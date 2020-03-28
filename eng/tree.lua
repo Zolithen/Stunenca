@@ -1,284 +1,118 @@
--- A tree
-serpent = require "eng/serpent"
 
-local tr = {}
+require "cmath"
 
--- Returns a node from the tree
-function tr:get(name)
-	if self.children[name] ~= nil then
-		return self.children[name], true
+lg = love.graphics
+
+local nt = {}
+
+-- Adds a children to the node
+function nt:add(n)
+	table.insert(self.children, n);
+	if self.on_add_children then
+		self:on_add_children(n, #self.children);
+	end
+end
+
+-- Find all the nodes that return true when passed to the cond function
+function nt:find(cond, t)
+	local t = t or {};
+	for i, v in ipairs(self.children) do
+		if cond(v) then
+			table.insert(t, v);
+			t = v:find(cond, t);
+		end	
+	end
+	return t;
+end
+
+-- Propagates an event to the entire node tree
+function nt:propagate_event(name, ...)
+	if self[name] then if self[name](self, ...) then return true end end
+	for i, v in ipairs(self.children) do
+		if not v.cancel_event then
+			if v:propagate_event(name, ...) then break; end
+		end
+	end
+end
+
+-- Propagates an event to the entire node tree in reverse
+function nt:propagate_event_reverse(name, ...)
+	if self[name] then if self[name](self, ...) then return true end end
+	for i, v in r_ipairs(self.children) do
+		if not v.cancel_event then
+			if v:propagate_event(name, ...) then break; end
+		end
+	end
+end
+
+function nt:propagate_event_raw(name, ...)
+	if self[name] then if self[name](self, ...) then return true end end
+	for i, v in ipairs(self.children) do
+		if v:propagate_event(name, ...) then break; end
+	end
+end
+
+function nt:propagate_event_reverse_raw(name, ...)
+	if self[name] then if self[name](self, ...) then return true end end
+	for i, v in r_ipairs(self.children) do
+		if v:propagate_event(name, ...) then break; end
+	end
+end
+
+-- Creates an array of references of all the nodes in the tree
+function nt:ref_array(a)
+	for i, v in ipairs(self.children) do
+		
+	end
+end
+
+-- Executes a funtion for every node in the tree
+function nt:traverse(func)
+	func(self);
+	for i, v in ipairs(self.children) do
+		v:traverse(func);
+	end
+end
+
+-- Gets the final x and y of the node
+function nt:get_x()
+	if self.parent then
+		return (self.x or 0) + (self.parent:get_x() or 0);
 	else
-		return new_tree(), false
+		return self.x or 0;
 	end
 end
 
--- Sets a new or old node as children
-function tr:set(name, n)
-	if type(name) == "string" then self.children[name] = new_tree(name, n, self) 
-	else self.children[name.name] = name; name.father = self end
-
-	print(name.name)
-
-	return self
-end
-
--- Executes a function for every children of the tree
-function tr:traverse(func, nx)
-	if not func(self, (nx or 0)) then
-		nx = (nx or 0) + 1 -- Level of recursion
-		for _, v in pairs(self.children) do
-      		v:traverse(func, (nx or 0))
-		end
+function nt:get_y()
+	if self.parent then
+		return (self.y or 0) + (self.parent:get_y() or 0);
+	else
+		return self.y or 0;
 	end
 end
 
--- Adds nodes for event listening
-function tr:listen(ev, ...)
-	local names = {...}
-	if self.listeners[ev] == nil then self.listeners[ev] = {} end
-	for i, v in pairs(names) do
-		table.insert(self.listeners[ev], v)
-	end
+function nt:get_pos()
+	return {x=self:get_x(), y=self:get_y()}
 end
 
-function tr:node_listen_raw(n)
-	if n then
-		for i, v in pairs(n.value) do
-			if type(v) == "function" then -- iterate all over the functions
-				self:listen(i, n.name)
-			end
-		end
-		if n.children then
-			for i, v in pairs(n.children) do
-				print(i, v)
-				n:node_listen(i)
-			end
-		end
-	end
-end
-
--- Adds all of a node's events as listeners
-function tr:node_listen(name)
-	local n = self:find(name)
-	--[[if n then
-		for i, v in pairs(n.value) do
-			if type(v) == "function" then -- iterate all over the functions
-				self:listen(i, name)
-			end
-		end
-	end]]
-	self:node_listen_raw(n)
-end
-
--- Executes an event for an specific node
-function tr:event_raw(name, node, ...)
-	if node.value[name] ~= nil then node.value[name](node.value, ...) end
-	--[[if not table.is_empty(node.children) then
-		for i, v in pairs(node.children) do -- calls the event for every children
-			self:event_raw(name, v, ...)
-		end
-	end]]
-	if node.listeners[name] then
-		node:event(name, ...)
-	end
-	--if node.listeners[name] then node:event(name, ...) end
-end
-
--- Executes an event for every children that is listening
-function tr:event(name, ...)
-	if self.listeners[name] then
-		for i, v in ipairs(self.listeners[name]) do -- calls the event for every listener
-			local f = self:find(v)
-			if f ~= nil then
-				self:event_raw(name, f, ...)
-			end
-		end
-	end
-
-end
-
--- Executes an event for every children that is listening
-function tr:event_reverse(name, ...)
-	if self.listeners[name] then
-		for i, v in r_ipairs(self.listeners[name]) do -- calls the event for every listener
-			local f = self:find(v)
-			if f ~= nil then
-				self:event_raw(name, f, ...)
-			end
-		end
-	end
-end
-
--- Reorders the listeners
-function tr:event_order(name, event, order)
-	if self.listeners[event] ~= nil then
-		if order == -1 then -- negative order
-			local temps = table.copy(self.listeners[event])
-			local list_set = Set(temps) -- creates a set from the listeners
-			local res = {}
-			for i, v in pairs(temps) do
-				if not (i == list_set[name]) then -- if the name is on listeners
-					table.insert(res, v)
-				end
-			end
-			table.insert(res, name) -- inserts the given name into the listeners
-			self.listeners[event] = table.copy(res)
-		elseif order == 1 then
-			print("fdsafasf")
-			local temps = table.copy(self.listeners[event])
-			local list_set = Set(temps) -- creates a set from the listeners
-			local res = {}
-			table.insert(res, name) -- inserts the given name into the listeners
-			for i, v in pairs(temps) do
-				if not (i == list_set[name]) then -- if the name is on listeners
-					table.insert(res, v)
-				end
-			end
-
-			for i, v in pairs(res) do
-				print(i, v)
-			end
-
-			self.listeners[event] = table.copy(res)
-		end
-	end
-end
-
--- Iterates all over a tree until finding a node with name n
-function tr:find(n)
-	if self.name == n then return self end
-	if not table.is_empty(self.children) then
-		for _, v in pairs(self.children) do
-			local nod = v:find(n)
-			if nod then return nod end
-		end
-		return nil
-	end
-end
-
--- Iterates all over a tree, returning the first node that fits with the
--- function provided.
-function tr:find_func(func)
-	if func(self) then return self end
-	if not table.is_empty(self.children) then
-		for _, v in pairs(self.children) do
-			local nod = v:find_func(func)
-			if nod then return nod end
-		end
-		return nil
-	end
-end
-
--- Iterates all over a tree, returning every node that fits with the
--- function provided
-function tr:find_func_all(func, ntt)
-	ntt = ntt or {}
-	if func(self) then 
-		table.insert(ntt, self)
-	end
-	for i, v in pairs(self.children) do
-		ntt = v:find_func_all(func, ntt)
-	end
-	return ntt
-	--[[local nt = ntt or {}
-	if func(self) then table.insert(nt, self) end
-	for i, v in pairs(self.children) do
-		v:find_func_all(func, nt)
-	end
-	return nt]]
-end
-
--- Gets a value from the value table
-function tr:get_value(n)
-	if type(self.value) == "table" then return self.value[n] end
-end
-
--- Sets a value from the value table
-function tr:set_value(n, v)
-	if type(self.value) == "table" then self.value[n] = v end
-end
-
--- Creates a new tree
-function new_tree(name, n, fa)
-	local val = n or {}
-	val.draw = function() end
-	val.update = function(dt) end
-	val.keypressed = function(key, scancode, isrepeat) end
-	val.keyreleased = function(key, scancode) end
-	val.mousepressed = function(x, y, button, presses) end
-	val.mousereleased = function(x, y, button, presses) end
-	val.textinput = function(text) end
-	val.draw = function() end
-	val.wheelmoved = function() end
-
-	local t = {
-		children = {},
-		value = val,
+function new_node(parent, name)
+	local n = {
 		name = name or "",
-		father = fa or {},
-		active = true,
-		visible = true,
-		listeners = {draw={}},
-		tag = ""
+		x = 0,
+		y = 0,
+		children = {},
+		parent = parent or nil
 	}
 
-	setmetatable(t, {__index=tr})
+	setmetatable(n, {__index=nt});
 
-	return t
-end
-
--- Game nodes
-local gn = {} -- Game node metatable
-local gn_index = table.copy(tr) -- Game node index metamethod
-local gnv = {} -- Game node value metatable
-local gnv_index = {} -- Game node index metamethod
-
-function gn_index:add_event(name, func)
-	self.value[name] = func
-end
-
-gnv.__index = gnv_index
-gn.__index = gn_index
---[[gn.__newindex = function(t, k, v)
-	if t.value then t.value[k] = v end
-end]]
-
-function new_game_node(name, x, y)
-	local t = new_tree(name, {
-		x = x or 0,
-		y = y or 0
-	})
-	setmetatable(t, gn)
-	setmetatable(t.value, gnv)
-	t.value.node = t
-	return t
-end
-
-function is_game_node(node)
-	if type(node) == "table" then
-		if node.value then
-			return getmetatable(node.value) == gnv
-		end
+	if parent then
+		parent:add(n);
 	end
-	return false
+
+	return n
 end
 
-local oldk = love.keyboard.isDown
-
-should_act_keys = true
-
-function love.keyboard.isDown(key)
-	return (oldk(key) and should_act_keys)
-end
-
-function block_keys()
-	should_act_keys = false
-end
-
-function clipx(x)
-	return x*love.graphics.getWidth()
-end
-
-function clipy(y)
-	return y*love.graphics.getHeight()
+function delegate_index_node()
+	return table.copy(nt);
 end
