@@ -1,7 +1,7 @@
 -2 Make nodes in node_tree_viewer selectable.
 -4 Add physics module
 -4 Add timers
-	-3 Types, You set a time and after that it executes a function and deletes itself, It executes a function every frame in that time, You set a time and after that it executes a function and does the same as if it was just created
+	-3 Types, You set a time and after that it executes a function and deletes itself (after), It executes a function every frame in that time (for), You set a time and after that it executes a function and does the same as if it was just created (Every)
 
 -4 Add input module
 
