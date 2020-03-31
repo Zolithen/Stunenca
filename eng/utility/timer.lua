@@ -25,24 +25,24 @@ function tmt:update(dt)
 	if self.time > 0 then
 		if self.type == "for" then
 			self.times_called = self.times_called + 1;
-			self:callback(dt, self.time, self.times_called);
+			self:callback(dt, self.time, self.times_called, self.object);
 		end
 		self.time = self.time - dt;
 	else
 		self.times_called = self.times_called + 1;
 		if self.type == "after" or self.type == "for" then
 			self.done = true;
-			self:callback(dt, self.time, self.times_called);
+			self:callback(dt, self.time, self.times_called, self.object);
 		else
 			self.time = self.max_time;
-			return self:callback(dt, self.time, self.times_called);
+			return self:callback(dt, self.time, self.times_called, self.object);
 		end
 	end
 	return false;
 end
 
 -- Executes a function after the time has passed, then deletes itself
-function new_timer_after(time, callback)
+function new_timer_after(time, callback, o)
 	local t = {}
 
 	t.time = time;
@@ -51,6 +51,7 @@ function new_timer_after(time, callback)
 	t.done = false;
 	t.times_called = 0;
 	t.type = "after";
+	t.object = o or {};
 
 	setmetatable(t, {__index=tmt});
 
@@ -58,7 +59,7 @@ function new_timer_after(time, callback)
 end
 
 -- Executes a function every time.
-function new_timer_every(time, callback)
+function new_timer_every(time, callback, o)
 	local t = {}
 
 	t.time = time;
@@ -67,6 +68,7 @@ function new_timer_every(time, callback)
 	t.done = false;
 	t.times_called = 0;
 	t.type = "every";
+	t.object = o or {};
 
 	setmetatable(t, {__index=tmt});
 
@@ -74,7 +76,7 @@ function new_timer_every(time, callback)
 end
 
 -- Executes a function every frame for time
-function new_timer_for(time, callback)
+function new_timer_for(time, callback, o)
 	local t = {}
 
 	t.time = time;
@@ -83,6 +85,7 @@ function new_timer_for(time, callback)
 	t.done = false;
 	t.times_called = 0;
 	t.type = "for";
+	t.object = o or {};
 
 	setmetatable(t, {__index=tmt});
 
