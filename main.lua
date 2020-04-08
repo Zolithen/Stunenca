@@ -1,10 +1,18 @@
 require "eng/tree"
 
+wf = require "eng/physics/windfield"
 require "eng/gui/gui_element"
 require "eng/gui/button"
 require "eng/gui/list/list"
 require "eng/gui/list/text_element_list"
 require "eng/gui/node_tree_viewer"
+
+require "eng/physics/world"
+require "eng/physics/circle_collider"
+
+function love.errorhandler(e)
+	print(e);
+end
 
 function create_scene()
 	local sscene = new_node(nil, "root");
@@ -13,6 +21,8 @@ function create_scene()
 	--scene:add(new_node());
 
 	local player = new_node(sscene, "player");
+	local world = physics_world(sscene, "world", 0, 0);
+	new_circle_collider(player, world, 320, 320, 32);
 	--local sea = new_node();
 	
 	--[[sea.draw = function(self)
@@ -28,18 +38,33 @@ function create_scene()
 	end
 
 	player.update = function(self, dt)
+		local col = player:find_name("collider").box;
+		local mov = {x=0,y=0}
 		if love.keyboard.isDown("a") then 
-			self.x = self.x - 3;
+			--self.x = self.x - 3;
+			--setLinearVelocity
+			mov.x = -1
+			--col:setLinearVelocity(-200, 0);
 		end
 		if love.keyboard.isDown("d") then 
-			self.x = self.x + 3;
+			--self.x = self.x + 3;
+			mov.x = 1
+			--col:setLinearVelocity(200, 0);
 		end
 		if love.keyboard.isDown("s") then 
-			self.y = self.y + 3;
+			--self.y = self.y + 3;
+			mov.y = 1
+			--col:setLinearVelocity(0, 200);
 		end
 		if love.keyboard.isDown("w") then 
-			self.y = self.y - 3;
+			--self.y = self.y - 3;
+			mov.y = -1
+			--col:setLinearVelocity(0, -200);
 		end
+		if love.keyboard.isDown("r") then
+			--world:delete();	
+		end
+		col:setLinearVelocity(mov.x*200, mov.y*200);
 	end
 
 	player.p = function(self, s)
@@ -50,7 +75,16 @@ function create_scene()
 
 	local li = new_list(sscene, "normal_list", 0.0, 0.2, 0.2, 0.2);
 
-	new_button(li, "button_in", 0, 0, 0.1, 0.1, function() print("holas") end, "holas");
+	local bbb = new_button(li, "button_in", 0, 0, 0.1, 0.1, function() 
+		print("holas") 
+		li:delete()
+	end, "holas");
+
+	--[[local d = new_node(bbb, "thingy");
+	d.a = 10
+	local f = new_node(bbb, "thingy");
+	f.a = 20
+	print(bbb:find_name("thingy")[2].a);]]
 
 	local si = new_text_element_list(sscene, "textel_list", 0.0, 0.0, 0.2, 0.2);
 
@@ -62,7 +96,7 @@ function create_scene()
 
 	local enemy_holder = new_node(sscene, "enemy__holder");
 
-	for i = 1, 1000 do
+	for i = 1, 1 do
 		local e = new_node(enemy_holder, "enemy");
 		e.ind = i;
 		e.draw = function(self)

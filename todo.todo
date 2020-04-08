@@ -1,12 +1,32 @@
--4 Add physics module
++-5 Add a good method of deleting nodes 
 
++-3 Add tree.find_name function
+
+-5 Add the node-component function interfaces for parents.
+	-1 When you add a special children to a node, the father node gets some proxy methods that when called call the children equivalent.
+
+-4 Add physics module
+	- Colliders as children nodes
+	- Local or global collision classes
+	- 
+-4 Add tweens
+
+-4 Create factory nodes for instantiating nodes from files
 
 -4 Add timers
-	-3 Types, You set a time and after that it executes a function and deletes itself (after), It executes a function every frame in that time (for), You set a time and after that it executes a function and does the same as if it was just created (Every)
+	+-3 Types, You set a time and after that it executes a function and deletes itself (after), It executes a function every frame in that time (for), You set a time and after that it executes a function and does the same as if it was just created (Every)
+	- Add a timer children node.
 
--4 Add input module
+-2 Add input module
+
+-2 Implement the local coordinate system
+
+-2 Particle system editor
+	- Particles as children nodes
 
 
--4 Graphical toolset
-	-3 Scene editor
+-1 Graphical toolset
+	-1 Scene editor
+
+
 	

@@ -1,9 +1,16 @@
-
 require "cmath"
 
 lg = love.graphics
 
 local nt = {}
+
+--[[
+
+	iterar sobre todos los hijos 
+		-> si name = self.name entonces retornar self
+		-> 
+
+]]
 
 -- Adds a children to the node
 function nt:add(n)
@@ -23,6 +30,18 @@ function nt:find(cond, t)
 		end	
 	end
 	return t;
+end
+
+-- Find the first node named name
+function nt:find_name(a, t)
+	local t = t or {};
+	for i, v in ipairs(self.children) do
+		if v.name == a then
+			table.insert(t, v);
+			t = v:find(a, t);
+		end	
+	end
+	return t[1];
 end
 
 -- Propagates an event to the entire node tree
@@ -59,13 +78,6 @@ function nt:propagate_event_reverse_raw(name, ...)
 	end
 end
 
--- Creates an array of references of all the nodes in the tree
-function nt:ref_array(a)
-	for i, v in ipairs(self.children) do
-		
-	end
-end
-
 -- Executes a funtion for every node in the tree
 function nt:traverse(func)
 	func(self);
@@ -95,6 +107,21 @@ function nt:get_pos()
 	return {x=self:get_x(), y=self:get_y()}
 end
 
+function nt:delete()
+	if self.on_delete then
+		self:on_delete();
+	end
+	if self.parent then
+		table.remove(self.parent.children, self.child_index);
+    	for i, v in ipairs(self.parent.children) do
+     		v.child_index = i;
+   		end
+		self = nil;
+	else
+		self = nil;
+	end
+end
+
 function new_node(parent, name)
 	local n = {
 		name = name or "",
@@ -107,6 +134,7 @@ function new_node(parent, name)
 	setmetatable(n, {__index=nt});
 
 	if parent then
+		n.child_index = #parent.children+1;
 		parent:add(n);
 	end
 
