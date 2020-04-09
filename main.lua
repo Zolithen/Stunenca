@@ -1,3 +1,7 @@
+function love.errorhandler(e)
+	print(e);
+end
+
 require "eng/tree"
 
 wf = require "eng/physics/windfield"
@@ -9,10 +13,11 @@ require "eng/gui/node_tree_viewer"
 
 require "eng/physics/world"
 require "eng/physics/circle_collider"
+require "eng/physics/rectangle_collider"
+require "eng/physics/line_collider"
 
-function love.errorhandler(e)
-	print(e);
-end
+require "eng/utility/timer"
+require "eng/utility/tween"
 
 function create_scene()
 	local sscene = new_node(nil, "root");
@@ -22,7 +27,17 @@ function create_scene()
 
 	local player = new_node(sscene, "player");
 	local world = physics_world(sscene, "world", 0, 0);
-	new_circle_collider(player, world, 320, 320, 32);
+	--world:query
+	new_tween_controller(sscene);
+	new_rectangle_collider(player, world, 0, 0, 16, 16, "dynamic");
+	local c = new_circle_collider(sscene, world, 400, 400, 20);
+
+	local sh = {x = 0, y = 0}
+
+	flux.to(sh, 4, { x = 200, y = 300 })
+	local col = player:find_component("collider");
+	col.node:sync_flux(sh, 200, 300);
+	--new_line_collider(sscene, world, 40, 40, 400, 400);
 	--local sea = new_node();
 	
 	--[[sea.draw = function(self)
@@ -34,11 +49,17 @@ function create_scene()
 	end]]
 
 	player.draw = function(self)
+		love.graphics.setColor(0, 1, 0, 1);
 		love.graphics.rectangle("fill", self.x, self.y, 16, 16)
+		love.graphics.setColor(1, 1, 1, 1);
+		love.graphics.print(sh.x, 200, 300);
+		love.graphics.rectangle("fill", sh.x, sh.y, 16, 16);
 	end
 
 	player.update = function(self, dt)
-		local col = player:find_name("collider").box;
+		--local col = player:find_name("collider").box;
+		local col = self:find_component("collider");
+		--col:setMass(100000000000000000);
 		local mov = {x=0,y=0}
 		if love.keyboard.isDown("a") then 
 			--self.x = self.x - 3;

@@ -1,21 +1,16 @@
-function new_circle_collider(s, w, x, y, r, t)
+function new_line_collider(s, w, x, y, x2, y2, t)
 	local c = new_node(s, "collider");
 
 	c.x = x;
 	c.y = y;
-	c.r = r;
-	if c.parent.name == "root" then
-		c.update_position = false;
-	else
-		c.update_position = true;
-	end
+	c.x2 = x2;
+	c.y2 = y2;
 
-	c.component = w.world:newCircleCollider(x, y, r);
+	c.component = w.world:newLineCollider(x, y, x2, y2);
 	c.component:setType(t or "static");
 	table.insert(w.colliders, c.component)
 
 	c.update = function(self, dt)
-		if not c.update_position then return end;
 		if c.parent then
 			c.parent.x = self.component:getX();
 			c.parent.y = self.component:getY();

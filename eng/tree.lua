@@ -4,17 +4,19 @@ lg = love.graphics
 
 local nt = {}
 
---[[
-
-	iterar sobre todos los hijos 
-		-> si name = self.name entonces retornar self
-		-> 
-
-]]
+-- Finds a component in the node's children
+function nt:find_component(nam)
+	for i, v in pairs(self.children) do
+		if v.name == nam and v.component ~= nil then
+			return v.component;
+		end
+	end
+end
 
 -- Adds a children to the node
 function nt:add(n)
 	table.insert(self.children, n);
+	-- On add children callback
 	if self.on_add_children then
 		self:on_add_children(n, #self.children);
 	end

@@ -2,14 +2,19 @@
 
 +-3 Add tree.find_name function
 
--5 Add the node-component function interfaces for parents.
-	-1 When you add a special children to a node, the father node gets some proxy methods that when called call the children equivalent.
++-5 Add the node-component function for parents.
+	-1 You can identify a node as having a component by creating a "component". Then, when adding that node as a children to another node, you can use self.find_component in the parent node to get the "component" field in the children node.
 
--4 Add physics module
++-4 Add physics module
 	- Colliders as children nodes
+	- Queries
 	- Local or global collision classes
 	- 
 -4 Add tweens
+	+-1 Use someone else's tween system
+	+-1 Add the ability to synchronize tables to collider's positions
+	-1 When stopping a tween, stop the synced colliders
+	-4 Implement my own tween system
 
 -4 Create factory nodes for instantiating nodes from files
 
