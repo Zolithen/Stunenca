@@ -1,5 +1,7 @@
 # Zariel-Engine
 
+![l](https://github.com/SuperHostile/Zariel-Engine/blob/master/logo.png "")
+
 This project uses:
 	1. **Windfield**: https://github.com/adnzzzzZ/windfield (Modifications were made: see below)
 	2. **Flux**: https://github.com/rxi/flux/ (Modifications were made: see below)
