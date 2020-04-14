@@ -24,6 +24,8 @@
 
 -2 Add input module
 
+-2 Add networking (needs node factories and input module)
+
 -2 Implement the local coordinate system
 
 -2 Particle system editor
@@ -32,6 +34,7 @@
 
 -1 Graphical toolset
 	-1 Scene editor
+	-1 Sprite and animation editor
 
 
 	

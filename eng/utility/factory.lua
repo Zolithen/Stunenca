@@ -1,5 +1,5 @@
 -- Factories are used for instantiating nodes in bulk from data tables
-local ft = {}
+--[[local ft = {}
 
 function ft:generate(data)
 	local l = {}
@@ -24,11 +24,6 @@ function new_factory(dict, consumer)
 	local fcons = {}
 	for i, v in pairs(consumer) do
 		local n = i;
-		--[[
-			function(data)
-				return proxied_func(s, a, data[1], l, data[2]);
-			end
-		]]
 		for index, data in pairs(v.provided) do
 
 		end
@@ -39,7 +34,7 @@ function new_factory(dict, consumer)
 	setmetatable(f, {__index = ft})
 
 	return f
-end
+end]]
 
 --[[
 	consumer -> set of functions that take the needed arguments and maps them
@@ -96,3 +91,9 @@ end
 
 	local n = f:generate(persistence.load("map.map"));
 ]]
+
+--[[local ft = {}
+
+function new_factory()
+
+end]]
