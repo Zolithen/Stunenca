@@ -89,7 +89,7 @@ function nt:traverse(func)
 end
 
 -- Gets the final x and y of the node
-function nt:get_x()
+--[[function nt:get_x()
 	if self.parent then
 		return (self.x or 0) + (self.parent:get_x() or 0);
 	else
@@ -102,6 +102,22 @@ function nt:get_y()
 		return (self.y or 0) + (self.parent:get_y() or 0);
 	else
 		return self.y or 0;
+	end
+end]]
+
+function nt:get_x(t)
+	if self.parent then
+		return self.parent:get_x()+self.x
+	else
+		return self.x
+	end
+end
+
+function nt:get_y(t)
+	if self.parent then
+		return self.parent:get_y()+self.y
+	else
+		return self.y
 	end
 end
 
