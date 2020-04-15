@@ -12,9 +12,8 @@
 	- 
 
 
--4 Add timers
++-4 Add timers
 	+-3 Types, You set a time and after that it executes a function and deletes itself (after), It executes a function every frame in that time (for), You set a time and after that it executes a function and does the same as if it was just created (Every)
-	- Add a timer children node.
 
 -3 Add spritesheet manager
 	-2 Animation
@@ -24,13 +23,16 @@
 	-2 Animation system
 	-2 Sprite layering
 
+-3 GUI stuff
+	-2
+
 -2 Add input module
 
 -2 Tilemap system
 
 -2 Create factory nodes for instantiating nodes from files
 
--2 Implement the local coordinate system
++-2 Implement the local coordinate system
 
 -2 Particle system editor
 	- Particles as children nodes
@@ -47,7 +49,7 @@
 -1 Graphical toolset
 	-1 Scene editor
 	-1 Tilemap editor
-	-1 Spritesheet editor
+	-2 Spritesheet editor
 
 -4 Bug fixing
 	-4 Test colliders with node.get_x and node.get_y

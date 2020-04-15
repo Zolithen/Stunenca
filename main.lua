@@ -93,10 +93,14 @@ function create_scene()
 	local li = new_list(sscene, "normal_list", 0.0, 0.2, 0.2, 0.2);
 
 	-- Adds a button to the list
-	local bbb = new_button(li, "button_in", 0, 0, 0.1, 0.1, function() 
-		print("delete list") 
-		li:delete()
-	end, "delete list");
+	local ossp = new_button(li, "button_ossp", 0, 0, 0.2, 0.1, function() 
+		print("Open spritesheet editor") 
+		require "toolset/spritesheet_editor"
+	end, "Open spritesheet editor");
+
+	local otme = new_button(li, "button_otme", 0, 0.1, 0.2, 0.1, function() 
+		print("Open tilemap editor") 
+	end, "Open tilemap editor");
 
 	-- Create a list of text
 	local si = new_text_element_list(sscene, "textel_list", 0.0, 0.0, 0.2, 0.2);
