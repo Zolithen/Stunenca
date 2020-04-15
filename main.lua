@@ -20,6 +20,7 @@ require "eng/utility/timer"
 require "eng/utility/tween"
 
 require "eng/graphics/sprite"
+require "eng/graphics/spritesheet"
 
 function create_scene()
 	-- Create a master node
@@ -33,28 +34,35 @@ function create_scene()
 	-- Create a tween controller
 	new_tween_controller(sscene);
 
+	-- Adds a new global spritesheet to the scene
+	new_spritesheet(sscene, "assets/colored_tilemap.png", 0, 0, 8, 8, 10, 10, 1, 1);
+
 	-- Add a physics collider to the player
 	new_rectangle_collider(player, world, 0, 0, 16, 16, "dynamic");
 
 	-- Add a sprite to the player
-	new_sprite(player, "logo.png");
+	new_animation(player, "assets/animation_test.png", 0, 0, 8, 8, 20, 2);
 
 	-- Create a static collider in the world
 	local c = new_circle_collider(sscene, world, 400, 400, 20);
 
 	-- Create a tween and sync a collider to it (badly, needs rework maybe and only works with rectangle colliders)
 	local sh = {x = 0, y = 0}
+	flux.to(sh, 1, { x = 50, y = 50 })
 
-	flux.to(sh, 4, { x = 200, y = 300 })
+	-- Finds the child node of player called "collider" which has a "component" field and return the field
 	local col = player:find_component("collider");
-	col.node:sync_flux(sh, 200, 300);
+
+	-- Sync the sh tween to the collider and wait for the col to get to x = 50,y=50
+	col.node:sync_flux(sh, 50, 50);
 
 	-- Declare a function for a node
 	player.draw = function(self)
 		love.graphics.setColor(0, 1, 0, 1);
-		love.graphics.rectangle("fill", self.x, self.y, 16, 16)
+		--love.graphics.rectangle("fill", self.x, self.y, 16, 16)
 		love.graphics.setColor(1, 1, 1, 1);
-		love.graphics.rectangle("fill", sh.x, sh.y, 16, 16);
+		--love.graphics.rectangle("fill", sh.x, sh.y, 16, 16);
+		love.graphics.print(player:find_component("sprite").ind, 300, 300);
 	end
 
 	player.update = function(self, dt)
@@ -114,7 +122,6 @@ end
 
 -- Instantiate the scene
 scene = create_scene();
-
 
 function love.draw()
 	-- Propagates the "draw" event to the node tree
