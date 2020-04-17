@@ -7,8 +7,10 @@ function new_sprite(s, imgd)
 		n.sprite = imgd
 	end
 	n.component = n;
+	n.visible = true;
 
 	n.draw = function(self)
+		if not self.visible then return end
 		love.graphics.draw(self.sprite, self:get_x(), self:get_y());
 	end
 
@@ -39,10 +41,11 @@ function new_animation(s, imgd, sx, sy, w, h, ax, ay)
 	n.state = "playing";
 	n.speed = 0.1;
 	n.timer = 0;
-	n.ind = 1
+	n.ind = 1;
+	n.visible = true;
 
 	n.update = function(self, dt)
-		if self.state == "playing" then
+		if self.state == "playing" and self.visible then
 			local l = math.floor(self.timer / (self.speed*#self.frames));
 			if l>=1 then self.timer = 0 end
 			n.timer = n.timer + dt;
@@ -51,6 +54,7 @@ function new_animation(s, imgd, sx, sy, w, h, ax, ay)
 	end
 
 	n.draw = function(self)
+		if not self.visible then return end
 		if self.ind > #self.frames then self.ind = 1 end
 		love.graphics.draw(self.sheet, self.frames[self.ind], self:get_x(), self:get_y());
 	end

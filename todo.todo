@@ -15,13 +15,9 @@
 +-4 Add timers
 	+-3 Types, You set a time and after that it executes a function and deletes itself (after), It executes a function every frame in that time (for), You set a time and after that it executes a function and does the same as if it was just created (Every)
 
--3 Add spritesheet manager
-	-2 Animation
-	-2 System for non equal dimensions and/or positions of textures (For graphical toolset)
-
 -3 Add sprite class
-	-2 Animation system
-	-2 Sprite layering
+	+-2 Animation system
+	-2 Sprite layering and modifications to those
 
 -3 GUI stuff
 	-2
@@ -30,12 +26,23 @@
 
 -2 Tilemap system
 
+-2 Use metatables for engine official nodes for better performance
+
 -2 Create factory nodes for instantiating nodes from files
 
 +-2 Implement the local coordinate system
 
 -2 Particle system editor
 	- Particles as children nodes
+
+-2 Add spritesheet manager
+	-2 Animation
+	-2 System for non equal dimensions and/or positions of textures (For graphical toolset)
+
+-1 Easy to add modding support
+	-1 Multiple mods
+
+-1 Add support for Teal (https://github.com/teal-language/tl/blob/master/docs/tutorial.md).
 
 -1 Add networking (needs node factories and input module)
 
