@@ -288,4 +288,4 @@ function r_ipairs(t)
     return reversedipairsiter, t, #t + 1
 end
 
-getmetatable('').__index = function(str,i) return string.sub(str,i,i) end
+--getmetatable('').__index = function(str,i) return string.sub(str,i,i) end
