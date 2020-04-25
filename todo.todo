@@ -17,9 +17,18 @@
 
 +-5 FIX CMATH FILE SETTING SETMETATABLE ON EMPTY STRING MAKES SILENT CRASHES (DELETE LAST LINE)
 
--3 Add sprite class
-	+-2 Animation system
-	-2 Sprite layering and modifications to those
+-4 The "game-ready" graphics module
+	-3 Spritesheet component
+		-3 Indexing data for animations and sprites on spritesheet.
+
+	-3 Graphic Object Component (temporal name?)
+		-2 Dynamically detecting if the given "" is an sprite or animation.
+
+	-3 Sprite class
+		+-2 Animation system
+		-2 Sprite layering and modifications to those
+
+	-1 An standard name for "sprite" and "animation".
 
 -3 GUI stuff
 	-2
@@ -59,6 +68,12 @@
 	-1 Scene editor
 	-1 Tilemap editor
 	-2 Spritesheet editor
+		-1 Sprite layering editor
+		-1 Animation editor
+
+-1 Android and (maybe) iOS compatibility
+	-1 GUI
+		-1 Make Lists scrollable
 
 -4 Bug fixing
 	-4 Test colliders with node.get_x and node.get_y

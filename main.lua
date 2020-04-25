@@ -1,6 +1,8 @@
-function love.errorhandler(e)
+--[[function love.errorhandler(e)
 	print(e);
-end
+end]]
+
+love.graphics.setDefaultFilter( "nearest")
 
 require "eng/tree"
 
@@ -83,6 +85,9 @@ function create_scene()
 		end
 		if love.keyboard.isDown("r") then
 			--world:delete();	
+		end
+		if love.keyboard.isDown("o") then
+			require "toolset/tests"
 		end
 		col:setLinearVelocity(mov.x*200, mov.y*200);
 	end

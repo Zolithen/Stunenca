@@ -11,6 +11,8 @@
 	dy -> pixels between quads in the y axis
 	data -> Dictionary data for naming quads
 ]]
+
+--test class
 function new_spritesheet(s, img, sx, sy, w, h, nx, ny, dx, dy, data)
 	local n = new_node(s, "spritesheet");
 
