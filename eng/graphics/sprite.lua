@@ -17,116 +17,7 @@ function new_sprite(s, imgd)
 	return n
 end
 
-function new_graphical_effect(t, m) 
-	local ge = {
-		type = t,
-		mod = m
-	}
-
-	return ge
-end
-
---[[function new_graphical_layer()
-
-end]]
-
-function new_graphical_layer(s, img, qd)
-	local l = {
-		index = #s.layers+1,
-		img = img,
-		quad = qd,
-		effects = {}
-	};
-	table.insert(s.layers, l);
-
-	return l;
-end
-
-function new_layered_sprite(s, imgd, sx, sy, w, h, ax, ay, dx, dy) 
-	local n = new_node(s, "layered_sprite");
-
-	n.layers = {}
-
-	if type(imgd) == "string" then
-		n.img = love.graphics.newImage(imgd);
-	else
-		n.img = imgd;
-	end
-
-
-	--[[
-		for y = 1, self.ny do
-			n.quads[y] = {}
-	 		for x = 1, self.nx do
-	 			local xx = (x-1)*self.w+self.sx+(x-1)*self.dx
-	 			local yy = (y-1)*self.h+self.sy+(y-1)*self.dy
-	 			n.quads[y][x] = love.graphics.newQuad(xx, yy, self.w, self.h, self.sheet:getDimensions())
-	 		end
-	 	end
-	]]
-	--0, 0, 8, 8, 1, 1, 0, 0
-	for y = 1, ay do
-	 	for x = 1, ax do
-	 		local xx = (x-1)*w+sx+(x-1)*dx
-	 		local yy = (y-1)*h+sy+(y-1)*dy
-	 		new_graphical_layer(n, n.img, love.graphics.newQuad(xx, yy, w, h, n.img:getDimensions()));
-	 		--table.insert(n.frames, love.graphics.newQuad(xx, yy, w, h, n.sheet:getDimensions()))
-	 	end
-	end
-
-	n.draw = function(self)
-		love.graphics.push()
-		love.graphics.translate(self.x, self.y);
-		for i, v in pairs(n.layers) do
-			love.graphics.push();
-			for j, k in pairs(v.effects) do
-				-- TODO: make this less of a mess
-				if k.type == "color" then
-					love.graphics.setColor(k.mod);
-				elseif k.type == "rotate" then
-					love.graphics.rotate(k.mod);
-				elseif k.type == "scale" then
-					love.graphics.scale(k.mod[1], k.mod[2]);
-				elseif k.type == "translate" then
-					love.graphics.translate(k.mod[1], k.mod[2]);
-				end
-			end
-			--
-			love.graphics.draw(v.img, v.quad);
-			love.graphics.setColor(1, 1, 1, 1);
-			love.graphics.pop();
-		end
-		love.graphics.pop()
-	end
-
-	return n;
-end
-
 --[[
-
-	Effect:
-		type: string
-		mod: number[]
-
-	Layer:
-		img: Image
-		mods: Effect[]
-		visible: boolean
-
-	Sprite:
-		layers: Layer[]
-
-	Animation:
-		frames: Sprite[]
-		speed: number
-
-	Spritesheet: Node
-		index_data: table
-
-	GraphicComponent: Node
-		spr_sheet: Spritesheet
-
-
 	-- Creates a new spritesheet from the image "gfx/player_sheet.png",
 	-- with the given indexing data "player_sheet_data".
 	{
@@ -161,10 +52,24 @@ end
 	--- After that, give the player the animation or sprite "walk_left".
 	pspr = new_sprite_sheet(player, "gfx/player_sheet.png", player_sheet_data);
 	local spr = new_graphic_object_component(player, pspr, "idle");
-	spr.visual = "walk_left";
+	--spr.visual = "walk_left";
+	spr:set_visual("walk_left");
 
 	draw_goc(spr)
 	spr:draw(0, 0);
+
+
+	-- Second approach
+	pspr = new_sprite_sheet(player, "gfx/player_sheet.png", player_sheet_data);
+	local spr = new_graphic_object_component(player, pspr, {
+		"pidle",
+		"pwalk_left",
+		"pwalk_right",
+		"pwalk_up",
+		"pwalk_down"
+	}, "pidle");
+	spr.visual = "pwalk_left"
+	
 
 ]]
 
@@ -174,19 +79,71 @@ end
 	return n;
 end]]
 
-function new_sprite_sheet(s, imgd, data)
+
+-- Standalone animation
+local anim_t = {}
+
+function anim_t:update(dt)
+	if self.state == "playing" then
+		local l = math.floor(self.timer / (self.speed*#self.frames));
+		if l>=1 then self.timer = 0 end
+		self.timer = self.timer + dt;
+		self.ind = math.floor(self.timer/self.speed)+1;
+	end
+end
+
+function anim_t:draw()
+	if self.ind > #self.frames then self.ind = 1 end
+	love.graphics.draw(self.sprs, self.frames[self.ind], 0,0);
+end
+
+function new_anim(img)
+	local a = {
+		sprs = img,
+		frames = {},
+		state = "playing",
+		speed = 1,
+		timer = 0,
+		ind = 1
+	}
+
+	setmetatable(a, {__index=anim_t});
+
+	return a;
+end
+
+local img_t = {}
+
+function img_t:draw()
+	love.graphics.draw(self.sprs, self.quad, 0, 0);
+end
+
+function new_frame(img)
+	local a = {
+		sprs = img,
+		quad = nil
+	}
+
+	setmetatable(a, {__index=img_t});
+
+	return a;
+end
+
+-- TODO: Optimization
+function new_spritesheet(s, imgd, data)
 	local n = new_node(s, "spritesheet")
 
 	n.component = n;
 
 	if type(imgd) == "string" then
-		n.sheet = love.graphics.newImage(imgd);
+		n.img = love.graphics.newImage(imgd);
 	else
-		n.sheet = imgd
+		n.img = imgd
 	end
 
 	n.quads = {}
-	n.index_data = {}
+	n.frame_data = {}
+	n.anim_data = {}
 	local inds = {}
 
 	-- typeless
@@ -200,60 +157,86 @@ function new_sprite_sheet(s, imgd, data)
 		local ax = v.ax; --amount of quads horizontally
 		local ay = v.ay; --amount of quads vertically
 		local qs = {}; --list of quads created from this data cluster
+		-- Create all the quads
 		for y = 1, ay do
 	 		for x = 1, ax do
 	 			local xx = (x-1)*qw+sx+(x-1)*qx
 	 			local yy = (y-1)*qh+sy+(y-1)*qy
-	 			local q = love.graphics.newQuad(xx, yy, qw, qh, n.sheet:getDimensions());
-	 			--table.insert(qs, );
+	 			local q = love.graphics.newQuad(xx, yy, qw, qh, n.img:getDimensions());
 	 			table.insert(qs, q);
-	 			--new_graphical_layer(n, n.img, love.graphics.newQuad(xx, yy, w, h, n.img:getDimensions()));
-	 			--table.insert(n.frames, love.graphics.newQuad(xx, yy, w, h, n.sheet:getDimensions()))
-	 			
 	 		end
 		end
+
+		-- Prepare indexing data for quads
 		for j, k in pairs(v.index) do
 			if k.type=="frame" then
-				n.index_data[k.name] = k.quad+#n.quads;
+				n.frame_data[k.name] = k.quad+#n.quads;
 			elseif k.type == "animation" then
-				for l, q in pairs(v.quads) do
-					
+				n.anim_data[k.name] = {quads={},speed=k.speed}
+				for l, q in pairs(k.quads) do
+					table.insert(n.anim_data[k.name].quads, q+#n.quads);
 				end
 			end
 		end
 
+		-- Add the quads to the quad list
 		for j, k in pairs(qs) do
 			table.insert(n.quads, k);
 		end
-		--[[table.insert(inds, data.index);
-
-		for i, v in pairs(data) do
-
-		end]]
-
-
 
 	end
 
-	n.get_quad = function(self, name)
-		return self.quads[self.index_data[name]];
+	n.get = function(self, name)
+		if self.frame_data[name] then
+			--return 
+			--local f = self.frame_data[name];
+			local fr = new_frame(self.img);
+			fr.quad = self.quads[self.frame_data[name]];
+			return fr
+		else
+			local a = self.anim_data[name];
+			local an = new_anim(self.img);
+			an.speed = a.speed;
+			for i, v in pairs(a.quads) do
+				an.frames[i]=self.quads[v];
+			end
+			return an;
+		end
 	end
 
 	return n
 end
 
-function new_graphic_object_component(s, spr, defs)
+function new_graphic_object_component(s, spr, alloc, defs)
 	local n = new_node(s, "goc");
 
-	n.img = spr;
+	n.spr = spr;
 	n.state = defs;
+
+	n.allocated_visuals = {}
+	for i, v in ipairs(alloc) do
+		n.allocated_visuals[v] = spr:get(v);
+	end
+
+	n.update = function(self, dt)
+		if self.allocated_visuals[self.state].update then
+			self.allocated_visuals[self.state]:update(dt);
+		end
+	end
+
+	n.draw = function(self)
+		self.allocated_visuals[self.state]:draw();
+	end
+
+	n.realloc = function(self, al)
+		self.allocated_visuals = {}
+		for i, v in ipairs(alloc) do
+			n.allocated_visuals[v] = spr:get(v);
+		end
+	end
 
 	n.component = n;
 
-	n.draw = function(self)
-		--if self.img:get_quad()
-	end
-
 	return n
 end
 
@@ -263,27 +246,29 @@ end
 
 
 
-
+-- Animation node
 
 function new_animation(s, imgd, sx, sy, w, h, ax, ay)
 	local n = new_node(s, "sprite");
 
 	if type(imgd) == "string" then
-		n.sheet = love.graphics.newImage(imgd);
+		n.img = love.graphics.newImage(imgd);
 	else
-		n.sheet = imgd
+		n.img = imgd
 	end
 
 	n.frames = {
 	}
 
-	 for y = 1, ay do
+	if sx ~= nil then
+	for y = 1, ay do
 	 	for x = 1, ax do
 	 		local xx = (x-1)*w+sx
 	 		local yy = (y-1)*h+sy
-	 		table.insert(n.frames, love.graphics.newQuad(xx, yy, w, h, n.sheet:getDimensions()))
+	 		table.insert(n.frames, love.graphics.newQuad(xx, yy, w, h, n.img:getDimensions()))
 	 	end
-	 end
+	end
+	end
 
 	n.component = n;
 	n.state = "playing";
@@ -304,7 +289,7 @@ function new_animation(s, imgd, sx, sy, w, h, ax, ay)
 	n.draw = function(self)
 		if not self.visible then return end
 		if self.ind > #self.frames then self.ind = 1 end
-		love.graphics.draw(self.sheet, self.frames[self.ind], self:get_x(), self:get_y());
+		love.graphics.draw(self.img, self.frames[self.ind], self:get_x(), self:get_y());
 	end
 
 	return n

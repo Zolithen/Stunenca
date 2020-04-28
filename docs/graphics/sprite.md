@@ -14,3 +14,7 @@ component -> sprite
 ## animation
 
 ## spritesheet
+
+
+# The sprite_sheet
+Zariel provides special nodes from drawing things on screen. Of course, you can still use the "draw" event and love's functions to draw things, but there are specific things that are made easier with Zariel's "sprite.lua" file. 

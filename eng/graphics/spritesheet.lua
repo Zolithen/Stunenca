@@ -13,7 +13,7 @@
 ]]
 
 --test class
-function new_spritesheet(s, img, sx, sy, w, h, nx, ny, dx, dy, data)
+--[[function new_spritesheet(s, img, sx, sy, w, h, nx, ny, dx, dy, data)
 	local n = new_node(s, "spritesheet");
 
 	n.component = n;
@@ -77,14 +77,14 @@ function new_spritesheet(s, img, sx, sy, w, h, nx, ny, dx, dy, data)
 		end
 	end
 
-	--[[n.change = function(self, d)
+	n.change = function(self, d)
 		if type(d) == "string" then
 			n.sheet = love.graphics.newImage(d);
 		else
 			n.sheet = d
 		end
 		self:create_quads();
-	end]]
+	end
 
 	return n
-end
+end]]

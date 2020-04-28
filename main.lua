@@ -22,6 +22,7 @@ require "eng/utility/timer"
 require "eng/utility/tween"
 
 require "eng/graphics/sprite"
+require "eng/graphics/layered_sprite"
 require "eng/graphics/spritesheet"
 
 function create_scene()
@@ -37,13 +38,13 @@ function create_scene()
 	new_tween_controller(sscene);
 
 	-- Adds a new global spritesheet to the scene
-	new_spritesheet(sscene, "assets/colored_tilemap.png", 0, 0, 8, 8, 10, 10, 1, 1);
+	--new_spritesheet(sscene, "assets/colored_tilemap.png", 0, 0, 8, 8, 10, 10, 1, 1);
 
 	-- Add a physics collider to the player
 	new_rectangle_collider(player, world, 0, 0, 16, 16, "dynamic");
 
 	-- Add a sprite to the player
-	new_animation(player, "assets/animation_test.png", 0, 0, 8, 8, 20, 2);
+	--new_animation(player, "assets/animation_test.png", 0, 0, 8, 8, 20, 2);
 
 	-- Create a static collider in the world
 	local c = new_circle_collider(sscene, world, 400, 400, 20);
@@ -64,7 +65,7 @@ function create_scene()
 		--love.graphics.rectangle("fill", self.x, self.y, 16, 16)
 		love.graphics.setColor(1, 1, 1, 1);
 		--love.graphics.rectangle("fill", sh.x, sh.y, 16, 16);
-		love.graphics.print(player:find_component("sprite").ind, 300, 300);
+		--love.graphics.print(player:find_component("sprite").ind, 300, 300);
 	end
 
 	player.update = function(self, dt)

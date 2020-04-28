@@ -18,17 +18,17 @@
 +-5 FIX CMATH FILE SETTING SETMETATABLE ON EMPTY STRING MAKES SILENT CRASHES (DELETE LAST LINE)
 
 -4 The "game-ready" graphics module
-	-3 Spritesheet component
+	+-3 Spritesheet component
 		-3 Indexing data for animations and sprites on spritesheet.
 
-	-3 Graphic Object Component (temporal name?)
+	+-3 Graphic Object Component (temporal name?)
 		-2 Dynamically detecting if the given "" is an sprite or animation.
 
 	-3 Sprite class
 		+-2 Animation system
-		-2 Sprite layering and modifications to those
+		?-2 Sprite layering and modifications to those
 
-	-1 An standard name for "sprite" and "animation".
+	+-1 An standard name for "sprite" and "animation".
 
 -3 GUI stuff
 	-2
