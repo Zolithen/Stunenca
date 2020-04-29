@@ -25,6 +25,8 @@ require "eng/graphics/sprite"
 require "eng/graphics/layered_sprite"
 require "eng/graphics/spritesheet"
 
+require "eng/experimental/p_experimental"
+
 function create_scene()
 	-- Create a master node
 	local sscene = new_node(nil, "root");
