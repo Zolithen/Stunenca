@@ -81,4 +81,29 @@
 	-4 Test colliders with node.get_x and node.get_y
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+------ NEW VERSION (Second rewrite) ------
 	
+--- GUI ---
+Add another type to Vector2: range relative to screen (0 - 1)

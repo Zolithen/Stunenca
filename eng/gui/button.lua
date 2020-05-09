@@ -1,44 +1,68 @@
+Button = GuiElement:extend("Button");
 
+function Button:init(parent, name, x, y, label, fnt, skin)
+	Button.super.init(self, parent, name, x, y, skin);
+	self.text_obj = love.graphics.newText(fnt, label);
+	self:set_text(label, fnt);
+end
 
-function new_button(parent, name, x, y, w, h, on_click, text)
-	local b = gui_element(parent, name);
+function Button:set_text(st, fnt)
+	self.text_obj = love.graphics.newText(fnt or self.fnt, st);
+	self.w = (self.text_obj:getWidth() + 16);
+	self.h = (self.text_obj:getHeight() + 32);
+end
 
-	b.x, b.y, b.w, b.h, b.on_click = x or 0, y or 0, w or 0, h or 0, on_click or function() end;
-
-	b.text = love.graphics.newText(love.graphics.getFont(), text or "");
-
-	b.draw = function(self)
-		--print(self.x)
-		local ww, hh = lg.getWidth(), lg.getHeight();
-		local mx = love.mouse.getX()/ww
-		local my = love.mouse.getY()/hh
-		--print("button node has a pos of", self:get_x(), self:get_y());
-		if math.pointraw(mx, my, self:get_x(), self:get_y(), self.w, self.h) then
-			love.graphics.setColor(
-				0.4, 0.4, 0.4, 1
-			)
-		else
-			love.graphics.setColor(0.1, 0.1, 0.1, 1);
-		end
-		love.graphics.rectangle("fill",self.x*ww, self.y*hh, self.w*ww, self.h*hh);
-		love.graphics.setColor(1, 1, 1, 1);
-		love.graphics.draw(self.text, 
-			self.x*ww+(self.w*ww-(self.w*ww/2))-self.text:getWidth()/2, 
-			self.y*hh+(self.h*hh-(self.h*hh/2))-self.text:getHeight()/2
-		)
+function Button:mousepressed(x, y, b)
+	if math.pointraw(
+		x/love.graphics.getPixelWidth(), 
+		y/love.graphics.getPixelHeight(), 
+		self:get_x(), 
+		self:get_y(), 
+		self.w/love.graphics.getPixelWidth(), 
+		self.h/love.graphics.getPixelHeight()
+	) then
+		print("dsadas");
 	end
+end
 
-	b.mousepressed = function(self, x, y, button)
-		local ww, hh = lg.getWidth(), lg.getHeight();
-		local mx = x/ww
-		local my = y/hh
-		if math.pointraw(mx, my, self:get_x(), self:get_y(), self.w, self.h) then
-			--print("got into")
-			self:on_click(mx, my, button)
-			return true;
-			--print("spñíkfghbasñoukfvbsalifkhjsba flkasjvf ask,jmfsabfklsajbfkln.sabf dsafk,asnv faslkj,hf");
-		end
+function Button:draw()
+	local sk = self:get_skin();
+	--print(sk);
+
+	--[[love.graphics.print("W: " .. self.w, 0, 32);
+	love.graphics.print("H: " .. self.h, 0, 48);
+	love.graphics.print("X: " .. self:get_x()*love.graphics.getPixelWidth(), 0, 64);
+	love.graphics.print("Y: " .. self:get_y()*love.graphics.getPixelHeight(), 0, 80);
+	love.graphics.print("MX: " .. love.mouse.getX(), 0, 96);
+	love.graphics.print("MY: " .. love.mouse.getY(), 0, 112);]]
+
+	if math.pointraw(
+		love.mouse.getX()/lg.getWidth(), 
+		love.mouse.getY()/lg.getHeight(), 
+		self:get_x(), 
+		self:get_y(), 
+		self.w/love.graphics.getPixelWidth(), 
+		self.h/love.graphics.getPixelHeight()
+	) then
+		love.graphics.setColor(
+			sk.highlight_color
+		);
+	else
+		love.graphics.setColor(
+			sk.default_color
+		);
 	end
+	love.graphics.rectangle("fill", 
+		self:get_x()*love.graphics.getPixelWidth(), 
+		self:get_y()*love.graphics.getPixelHeight(), 
+		self.w, 
+		self.h
+	);
+	love.graphics.setColor(
+		--self:get_skin_attribute("font_color")
+		sk.font_color
+	);
+	love.graphics.draw(self.text_obj, self:get_x()*love.graphics.getPixelWidth()+8, self:get_y()*love.graphics.getPixelHeight()+16);
+	love.graphics.setColor(1, 1, 1, 1);
 
-	return b;
 end

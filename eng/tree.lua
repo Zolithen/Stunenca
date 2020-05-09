@@ -1,8 +1,124 @@
 require "cmath"
+class = require "eng/utility/30log"
 
 lg = love.graphics
 
-local nt = {}
+Node = class("Node");
+
+Node.children = {};
+
+-- TODO: Batch node adding
+function Node:init(parent, name, x, y)
+	self.x, self.y = x, y;
+	self.parent = parent;
+	self.name = name;
+	self.childs = -1;
+
+	self:count_child();
+
+	if parent then
+		table.insert(parent.children, self);
+		self.child_index = #parent.children;
+	--else
+		
+	end
+end
+
+function Node:count_child()
+	self.childs = self.childs + 1;
+	if self.parent then
+		self.parent:count_child();
+	end
+end
+
+function Node:get_root_attr(name)
+	if self.parent then
+		return self.parent:get_root_attr(name) or nil;
+	else
+		return self[name] or nil;
+	end
+end
+
+function Node:add(n)
+	table.insert(self.children, n);
+	n.child_index = #self.children;
+	if self.on_add_children then
+		self:on_add_children(n, #self.children);
+	end
+end
+
+function Node:propagate_event(name, ...)
+	for i, v in ipairs(self.children) do
+		if v[name] then
+			v[name](v, ...);
+		end
+	end
+end
+
+function Node:propagate_event_reverse(name, ...)
+	for i, v in r_ipairs(self.children) do
+		if v[name] then
+			v[name](...);
+		end
+	end
+end
+
+function Node:find(cond, t)
+	local t = t or {};
+	for i, v in ipairs(self.children) do
+		if cond(v) then
+			table.insert(t, v);
+			t = v:find(cond, t);
+		end	
+	end
+	return t;
+end
+
+-- Find the first node named name
+-- TODO : Optimization
+function Node:find_name(a, t)
+	local t = t or {};
+	for i, v in ipairs(self.children) do
+		if v.name == a then
+			table.insert(t, v);
+			break;
+		else
+			t = v:find(a, t);
+		end	
+	end
+	return t[1];
+end
+
+function Node:get_x()
+	if self.parent then
+		return (self.x or 0) + (self.parent:get_x() or 0);
+	else
+		return self.x or 0;
+	end
+end
+
+function Node:get_y()
+	if self.parent then
+		return (self.y or 0) + (self.parent:get_y() or 0);
+	else
+		return self.y or 0;
+	end
+end
+
+function Node:remove()
+	if self.parent then
+		table.remove(self.parent.children, self.child_index);
+		for i, v in ipairs(self.parent.children) do
+			v.child_index = i;
+		end
+	end
+	for i, v in ipairs(self.children) do
+		v:remove();
+	end
+
+end
+
+--[[local nt = {}
 
 -- Finds a component in the node's children
 function nt:find_component(nam)
@@ -89,7 +205,7 @@ function nt:traverse(func)
 end
 
 -- Gets the final x and y of the node
---[[function nt:get_x()
+function nt:get_x()
 	if self.parent then
 		return (self.x or 0) + (self.parent:get_x() or 0);
 	else
@@ -103,7 +219,7 @@ function nt:get_y()
 	else
 		return self.y or 0;
 	end
-end]]
+end
 
 function nt:get_x(t)
 	if self.parent then
@@ -161,4 +277,4 @@ end
 
 function delegate_index_node()
 	return table.copy(nt);
-end
+end]]
