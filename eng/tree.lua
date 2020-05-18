@@ -48,18 +48,16 @@ function Node:add(n)
 end
 
 function Node:propagate_event(name, ...)
+	if self[name] then self[name](self, ...); end
 	for i, v in ipairs(self.children) do
-		if v[name] then
-			v[name](v, ...);
-		end
+		v:propagate_event(name, ...);
 	end
 end
 
 function Node:propagate_event_reverse(name, ...)
+	if self[name] then self[name](self, ...); end
 	for i, v in r_ipairs(self.children) do
-		if v[name] then
-			v[name](...);
-		end
+		v:propagate_event_reverse(name, ...);
 	end
 end
 
@@ -116,6 +114,21 @@ function Node:remove()
 		v:remove();
 	end
 
+end
+
+function Node:remove_all()
+	for i, v in r_ipairs(self.children) do
+		v:remove_all();
+		table.remove(self.children, i);
+	end
+end
+
+function Node:get_root()
+	if self.parent then
+		return self.parent:get_root();
+	else
+		return self;
+	end
 end
 
 --[[local nt = {}
