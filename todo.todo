@@ -107,3 +107,7 @@
 	
 --- GUI ---
 Add another type to Vector2: range relative to screen (0 - 1)
+Zariel Graphical Interface Files (ZGIF) -> Store GUIs on files.
+
+--- MISC ---
+Add a way to interpret a filesystem as a node tree.
