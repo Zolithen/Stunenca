@@ -1,113 +1,17 @@
-+-5 Add a good method of deleting nodes 
+--- GRAPHICS ---
+Batch rendering
 
-+-3 Add tree.find_name function
-
-+-5 Add the node-component function for parents.
-	-1 You can identify a node as having a component by creating a "component". Then, when adding that node as a children to another node, you can use self.find_component in the parent node to get the "component" field in the children node.
-
-+-4 Add physics module
-	- Colliders as children nodes
-	- Queries
-	- Local or global collision classes
-	- 
-
-
-+-4 Add timers
-	+-3 Types, You set a time and after that it executes a function and deletes itself (after), It executes a function every frame in that time (for), You set a time and after that it executes a function and does the same as if it was just created (Every)
-
-+-5 FIX CMATH FILE SETTING SETMETATABLE ON EMPTY STRING MAKES SILENT CRASHES (DELETE LAST LINE)
-
--4 The "game-ready" graphics module
-	+-3 Spritesheet component
-		-3 Indexing data for animations and sprites on spritesheet.
-
-	+-3 Graphic Object Component (temporal name?)
-		-2 Dynamically detecting if the given "" is an sprite or animation.
-
-	-3 Sprite class
-		+-2 Animation system
-		?-2 Sprite layering and modifications to those
-
-	+-1 An standard name for "sprite" and "animation".
-
--3 GUI stuff
-	-2
-
--2 Add input module
-
--2 Tilemap system
-
--2 Use metatables for engine official nodes for better performance
-
--2 Create factory nodes for instantiating nodes from files
-
-+-2 Implement the local coordinate system
-
--2 Particle system editor
-	- Particles as children nodes
-
--2 Add spritesheet manager
-	-2 Animation
-	-2 System for non equal dimensions and/or positions of textures (For graphical toolset)
-
--1 Easy to add modding support
-	-1 Multiple mods
-
--1 Add support for Teal (https://github.com/teal-language/tl/blob/master/docs/tutorial.md).
-
--1 Add networking (needs node factories and input module)
-
--1 Tweens
-	+-1 Use someone else's tween system
-	+-1 Add the ability to synchronize tables to collider's positions
-	-1 When stopping a tween, stop the synced colliders
-	-1 Implement my own tween system
-	-1 Sync colliders to the target positions of the tween
-
--1 Graphical toolset
-	-1 Scene editor
-	-1 Tilemap editor
-	-2 Spritesheet editor
-		-1 Sprite layering editor
-		-1 Animation editor
-
--1 Android and (maybe) iOS compatibility
-	-1 GUI
-		-1 Make Lists scrollable
-
--1 If possible, add experimental 3d support
-
--4 Bug fixing
-	-4 Test colliders with node.get_x and node.get_y
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
------- NEW VERSION (Second rewrite) ------
-	
 --- GUI ---
-Add another type to Vector2: range relative to screen (0 - 1)
-Zariel Graphical Interface Files (ZGIF) -> Store GUIs on files.
+Window frame system
+
+--- INPUT ---
+
 
 --- MISC ---
-Add a way to interpret a filesystem as a node tree.
+State machine
+Efficient serialization system
+Node pools for efficient event sending.
+Add support for Teal.
+Add a way to interpretet a file system as a tree.
+Create a test framework just in case.
+Maybe use Raptor?

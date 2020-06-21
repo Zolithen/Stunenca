@@ -1,13 +1,15 @@
+-- TODO : Implement cmath's useful functions on to the engine.
 require "cmath"
 class = require "eng/utility/30log"
 
 lg = love.graphics
 
 Node = class("Node");
+NodeCache = class("NodeCache");
 
 Node.children = {};
 
--- TODO : change this function cus this code is unlicensed although is a gist
+-- TODO : change this function cus this code is unlicensed although its a gist
 --https://gist.github.com/jrus/3197011
 local random = math.random
 local function uuid()
@@ -25,6 +27,7 @@ function Node:init(parent, name, x, y)
 	self.name = name;
 	self.childs = -1;
 	self.uuid = uuid();
+	self.ev_line = "";
 	resseed();
 	
 
@@ -33,8 +36,9 @@ function Node:init(parent, name, x, y)
 	if parent then
 		table.insert(parent.children, self);
 		self.child_index = #parent.children;
-	--else
-		
+		self.cache = self:get_root().cache;
+	else
+		self.cache = NodeCache(self);
 	end
 end
 
@@ -133,15 +137,26 @@ end
 
 function Node:remove_all()
 	for i, v in r_ipairs(self.children) do
-		v:remove_all();
-		table.remove(self.children, i);
+		--table.remove(self.children, i);
+		v:remove();
+		--v:remove_all();
 	end
 end
 
 function Node:get_root()
+	if self.cache then return self.cache.root end
 	if self.parent then
 		return self.parent:get_root();
 	else
+		self.cache.root = self;
 		return self;
 	end
+end
+
+function NodeCache:init(root)
+	self.root = root;
+end
+
+function NodeCache:reset()
+	self.root = nil;
 end
