@@ -11,7 +11,8 @@ require "eng/gui/NodeTreeEditor"
 
 require "eng/gui/engine/Inspector"
 
-require "eng/utility/input"
+require "eng/utility/Input"
+require "eng/graphics/SpriteBatch"
 
 scene = Node(nil, "scene", 0, 0); -- uses absolute positioning
 
@@ -23,6 +24,13 @@ local egui_skin = GuiSkin(egui);
 egui.skin = egui_skin;
 
 inp = InputManager(scene);
+
+local rec_sprite = love.graphics.newImage("assets/rectangle.png");
+batch = NodeSpriteBatch(scene, "batch", 1, 1);
+batch:add_texture(rec_sprite, 0, 0);
+--batch:add_rectangle(1, 0, 0, 0, 16, 16);
+--batch:send();
+
 
 inp:hook_up("left1", "a");
 inp:hook_up("right1", "d");
@@ -45,11 +53,13 @@ local Player = Node:extend("Player");
 
 function Player:init(x, y)
 	Player.super.init(self, players, "player", x, y);
+	self.batch_index = batch:add_rect(1, self.x, self.y, 0, 16, 16);
 end
 
 function Player:draw()
 	love.graphics.setColor(1, 1, 1, 1);
-	love.graphics.rectangle("fill", self:get_x(), self:get_y(), 16 ,16);
+	batch:set_rect(self.batch_index, 1, self.x, self.y, 0, 16, 16);
+	--love.graphics.rectangle("fill", self:get_x(), self:get_y(), 16 ,16);
 end
 
 function Player:update(dt)

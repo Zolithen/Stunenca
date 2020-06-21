@@ -28,7 +28,7 @@ function Node:init(parent, name, x, y)
 	self.childs = -1;
 	self.uuid = uuid();
 	self.ev_line = "";
-	resseed();
+	math.reseed();
 	
 
 	self:count_child();
