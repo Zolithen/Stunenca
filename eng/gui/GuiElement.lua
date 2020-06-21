@@ -42,3 +42,5 @@ end
 --[[function GuiElement:get_skin_attribute(name)
 	return self:get_skin()[name];
 end]]
+
+return GuiElement

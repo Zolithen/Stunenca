@@ -26,3 +26,5 @@ function GuiSkin:get_clickable_color(x, y, w, h)
 		return self.highlight_color
 	end
 end
+
+return GuiSkin

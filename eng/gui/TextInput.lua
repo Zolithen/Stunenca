@@ -53,3 +53,5 @@ function TextInput:textinput(t)
 		self.w = self.ins_text:getWidth();
 	end
 end
+
+return TextInput

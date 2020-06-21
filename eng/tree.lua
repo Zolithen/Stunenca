@@ -7,12 +7,26 @@ Node = class("Node");
 
 Node.children = {};
 
+-- TODO : change this function cus this code is unlicensed
+--https://gist.github.com/jrus/3197011
+local random = math.random
+local function uuid()
+    local template ='xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'
+    return string.gsub(template, '[xy]', function (c)
+        local v = (c == 'x') and random(0, 0xf) or random(8, 0xb)
+        return string.format('%x', v)
+    end)
+end
+
 -- TODO: Batch node adding
 function Node:init(parent, name, x, y)
 	self.x, self.y = x, y;
 	self.parent = parent;
 	self.name = name;
 	self.childs = -1;
+	self.uuid = uuid();
+	resseed();
+	
 
 	self:count_child();
 
@@ -113,6 +127,7 @@ function Node:remove()
 	for i, v in ipairs(self.children) do
 		v:remove();
 	end
+	self = nil;
 
 end
 

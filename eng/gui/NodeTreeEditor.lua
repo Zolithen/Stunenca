@@ -198,3 +198,5 @@ function NodeTreeEditor:wheelmoved(mx, my)
 
 	end
 end
+
+return NodeTreeEditor

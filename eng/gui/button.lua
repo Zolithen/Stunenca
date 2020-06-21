@@ -66,3 +66,5 @@ function Button:draw()
 	love.graphics.setColor(1, 1, 1, 1);
 
 end
+
+return Button
