@@ -1,21 +1,27 @@
 --- GRAPHICS ---
-Batch rendering
 Rounded rectangles for batch rendering in some way
 
 --- GUI ---
 Window frame system
+GUI Elements
 Better window resizing
+Customizable defined window borders
 Maybe batch everything?
 
 --- INPUT ---
 
+
+--- SCENE GRAPH ---
+Add a system to block events in certain directions (dont send to children, stop propagating event, dont send to siblings)
+Node pools for efficient event sending.
 
 --- MISC ---
 Timer system.
 State machine.
 Efficient serialization system.
 Node factories.
-Node pools for efficient event sending.
 Add support for Teal.
 Add a way to interpret a file system as a tree.
 Create a test framework.
+Add a way to check performance.
+Experiment with an ECS system.

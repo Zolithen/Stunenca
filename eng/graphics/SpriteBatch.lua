@@ -10,7 +10,7 @@ end
 
 -- draws the batch
 function NodeSpriteBatch:draw()
-	if self.alpha_premult then
+	if self.alpha_premult then -- fixes issues with pre rendered text on batches
 		love.graphics.setBlendMode("alpha", "premultiplied")
 	end
 	love.graphics.draw(self.batch, 0, 0);

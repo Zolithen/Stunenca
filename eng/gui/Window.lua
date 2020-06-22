@@ -65,12 +65,6 @@ function Window:draw()
 		2,
 		self.x, self.y
 	);
-
-	--[[love.graphics.push()
-	love.graphics.scale(4, 4);
-	love.graphics.draw(self.t, self.x, self.y -48);
-	love.graphics.draw(self.batch.canvas, self.x, self.y);
-	love.graphics.pop();]]
 	--[[self.batch:set_rect(
 		self.batch_ind.close_button,
 		1,
