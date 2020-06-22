@@ -1,36 +1,30 @@
 GuiState = {};
+love.graphics.setDefaultFilter("nearest", "nearest");
 
 require "eng/tree"
 
-require "eng/gui/GuiSkin"
-require "eng/gui/GuiElement"
-require "eng/gui/Button"
-require "eng/gui/TextInput"
-
-require "eng/gui/NodeTreeEditor"
-
-require "eng/gui/engine/Inspector"
 
 require "eng/utility/Input"
 require "eng/graphics/SpriteBatch"
 
+require "eng/gui/GuiElement"
+require "eng/gui/WindowController"
+require "eng/gui/Window"
+
 scene = Node(nil, "scene", 0, 0); -- uses absolute positioning
 
 -- uses relative positioning
-gui = GuiElement(nil, "gui", 0, 0); -- game's gui
-egui = GuiElement(nil, "egui", 0, 0); -- engine's gui
+gui = Panel(nil, "gui", 0, 0); -- game's gui
+egui = Panel(nil, "egui", 0, 0); -- engine's gui
 
-local egui_skin = GuiSkin(egui);
-egui.skin = egui_skin;
+--[[local egui_skin = GuiSkin(egui);
+egui.skin = egui_skin;]]
 
 inp = InputManager(scene);
 
 local rec_sprite = love.graphics.newImage("assets/rectangle.png");
 batch = NodeSpriteBatch(scene, "batch", 1, 1);
 batch:add_texture(rec_sprite, 0, 0);
---batch:add_rectangle(1, 0, 0, 0, 16, 16);
---batch:send();
-
 
 inp:hook_up("left1", "a");
 inp:hook_up("right1", "d");
@@ -53,13 +47,12 @@ local Player = Node:extend("Player");
 
 function Player:init(x, y)
 	Player.super.init(self, players, "player", x, y);
-	self.batch_index = batch:add_rect(1, self.x, self.y, 0, 16, 16);
+	self.batch_index = batch:add_rect(1, self.x, self.y, 16, 16);
 end
 
 function Player:draw()
 	love.graphics.setColor(1, 1, 1, 1);
-	batch:set_rect(self.batch_index, 1, self.x, self.y, 0, 16, 16);
-	--love.graphics.rectangle("fill", self:get_x(), self:get_y(), 16 ,16);
+	batch:set_rect(self.batch_index, 1, self.x, self.y, 16, 16);
 end
 
 function Player:update(dt)
@@ -81,6 +74,13 @@ Player(0, 0);
 Player(16, 16);
 Player(32, 32);
 
+egui = WindowController();
+
+--[[Window(egui, "test_window", 100, 100, "1");
+Window(egui, "test2", 200, 200, "2");]]
+egui:add_window("test1", 100, 100, "1");
+egui:add_window("test2", 200, 200, "2");
+
 function love.draw()
 	scene:propagate_event("draw");
 	egui:propagate_event("draw");
@@ -95,6 +95,16 @@ end
 function love.mousepressed(x, y, b)
 	egui:propagate_event_reverse("mousepressed", x, y, b);
 	scene:propagate_event_reverse("mousepressed", x, y, b);
+end
+
+function love.mousereleased(x, y, b)
+	egui:propagate_event_reverse("mousereleased", x, y, b);
+	scene:propagate_event_reverse("mousereleased", x, y, b);
+end
+
+function love.mousemoved(x, y, dx, dy)
+	egui:propagate_event_reverse("mousemoved", x, y, dx, dy);
+	scene:propagate_event_reverse("mousemoved", x, y, dx, dy);
 end
 
 function love.wheelmoved(y, x)

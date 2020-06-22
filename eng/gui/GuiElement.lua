@@ -1,4 +1,4 @@
-GuiElement = Node:extend("GuiElement");
+--[[GuiElement = Node:extend("GuiElement");
 
 -- needs parent set to relative positioning
 function GuiElement:init(parent, name, x, y, skin)
@@ -6,9 +6,9 @@ function GuiElement:init(parent, name, x, y, skin)
 	if skin then
 		self.skin = skin;
 	else
-		--[[if parent then
-			parent:get_skin();
-		end]]
+		--if parent then
+		--	parent:get_skin();
+		--end
 	end
 	self.focused = false;
 end
@@ -39,8 +39,6 @@ function GuiElement:get_y()
 	end
 end
 
---[[function GuiElement:get_skin_attribute(name)
-	return self:get_skin()[name];
-end]]
+return GuiElement]]
 
-return GuiElement
+Panel = Node:extend("Panel");

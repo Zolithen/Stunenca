@@ -1,17 +1,21 @@
 --- GRAPHICS ---
 Batch rendering
+Rounded rectangles for batch rendering in some way
 
 --- GUI ---
 Window frame system
+Better window resizing
+Maybe batch everything?
 
 --- INPUT ---
 
 
 --- MISC ---
-State machine
-Efficient serialization system
+Timer system.
+State machine.
+Efficient serialization system.
+Node factories.
 Node pools for efficient event sending.
 Add support for Teal.
-Add a way to interpretet a file system as a tree.
-Create a test framework just in case.
-Maybe use Raptor?
+Add a way to interpret a file system as a tree.
+Create a test framework.

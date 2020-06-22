@@ -66,14 +66,14 @@ function Node:add(n)
 end
 
 function Node:propagate_event(name, ...)
-	if self[name] then self[name](self, ...); end
+	if self[name] then self[name](self, ...) end
 	for i, v in ipairs(self.children) do
 		v:propagate_event(name, ...);
 	end
 end
 
 function Node:propagate_event_reverse(name, ...)
-	if self[name] then self[name](self, ...); end
+	if self[name] then self[name](self, ...) end
 	for i, v in r_ipairs(self.children) do
 		v:propagate_event_reverse(name, ...);
 	end
