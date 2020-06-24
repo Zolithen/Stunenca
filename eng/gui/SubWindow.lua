@@ -86,7 +86,7 @@ function SubWindow:mousereleased()
 end
 
 function SubWindow:draw_box()
-	return self:get_x(), self:get_y(), self.draw_w, self.draw_h;
+	return self:get_x(), self:get_y(), math.min(self.draw_w, self.parent.w), math.min(self.draw_h, self.parent.h);
 end
 
 function SubWindow:test_box()
