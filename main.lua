@@ -10,12 +10,15 @@ require "eng/graphics/SpriteBatch"
 require "eng/gui/GuiElement"
 require "eng/gui/WindowController"
 require "eng/gui/Window"
+require "eng/gui/Label"
+require "eng/gui/Button"
+require "eng/gui/SubWindow"
 
 scene = Node(nil, "scene", 0, 0); -- uses absolute positioning
 
 -- uses relative positioning
-gui = Panel(nil, "gui", 0, 0); -- game's gui
-egui = Panel(nil, "egui", 0, 0); -- engine's gui
+gui = GuiElement(nil, "gui", 0, 0); -- game's gui
+egui = GuiElement(nil, "egui", 0, 0); -- engine's gui
 
 --[[local egui_skin = GuiSkin(egui);
 egui.skin = egui_skin;]]
@@ -74,16 +77,32 @@ Player(0, 0);
 Player(16, 16);
 Player(32, 32);
 
+--local fnt = love.graphics.newFont("assets/Roboto-Thin.ttf", 14);
+local fnt = love.graphics.getFont();
 egui = WindowController();
 
 --[[Window(egui, "test_window", 100, 100, "1");
 Window(egui, "test2", 200, 200, "2");]]
-egui:add_window("test1", 100, 100, "1");
-egui:add_window("test2", 200, 200, "2");
+local win1 = egui:add_window("test1", 100, 100, "1");
+local win2 = egui:add_window("test2", 200, 200, "2");
+--win1.evisible = false;
+egui:register_element("label", Label);
+egui:register_element("button", Button);
+egui:register_element("subw", SubWindow);
+egui:add_element("test1", "label", "AAAAAAAA", 0, 0);
+egui:add_element("test1", "button", "AAAAAAAAAAAAAAAAAAAAAA", fnt, 0, 16);
+egui:add_element("test2", "subw", 0, 0, 128, 128, 100, 100);
+egui:add_element("test2", "label", "wojñsfgbasf", 0, 200);
+--abel(egui, "test1", "sklofa", "iaskfj");
 
 function love.draw()
 	scene:propagate_event("draw");
 	egui:propagate_event("draw");
+	love.graphics.setStencilTest();
+	love.graphics.setColor(1, 1, 1, 1);
+	scene:propagate_event("postdraw");
+	egui:propagate_event("postdraw");
+	love.graphics.setStencilTest();
 	love.graphics.setColor(1, 1, 1, 1);
 end
 

@@ -37,6 +37,7 @@ function NodeSpriteBatch:add_texture(i, x, y)
 		)
 	);
 	love.graphics.setCanvas();
+	return #self.quads-1;
 end
 
 function NodeSpriteBatch:add_texture_wh(i, x, y, w, h)
@@ -52,6 +53,7 @@ function NodeSpriteBatch:add_texture_wh(i, x, y, w, h)
 		)
 	);
 	love.graphics.setCanvas();
+	return #self.quads-1;
 end
 
 function NodeSpriteBatch:add_texture_print(f, s, x, y)
@@ -70,7 +72,7 @@ function NodeSpriteBatch:add_texture_print(f, s, x, y)
 		)
 	);
 	love.graphics.setCanvas();
-	return t;
+	return t, #self.quads-1;
 end
 
 function NodeSpriteBatch:add_rect(imgind, x, y, sx, sy, r, ox, oy, kx, ky)
@@ -88,3 +90,20 @@ end
 function NodeSpriteBatch:set_color(r, g, b, a)
 	self.batch:setColor(r, g, b, a);
 end
+
+NodeVerticalSpriteBatch = NodeSpriteBatch:extend("NodeVerticalSpriteBatch");
+
+function NodeVerticalSpriteBatch:init(sc, n, atw, ath, al_premult)
+	NodeSpriteBatch.init(self, sc, n, atw, ath, al_premult);
+	self.allocated = 0;
+end
+
+function NodeVerticalSpriteBatch:alloc(v)
+	self.allocated = self.allocated + v;
+end
+
+--[[
+	batch = NodeVrsraofplas;
+
+	local ind = batch:alloc_print();
+]]

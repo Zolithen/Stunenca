@@ -89,3 +89,10 @@ end
 function r_ipairs(t)
     return reversedipairsiter, t, #t + 1
 end
+
+function is_hovered(...)
+  return math.pboverlapraw(
+      love.mouse.getX(), love.mouse.getY(),
+      ...
+    )
+end

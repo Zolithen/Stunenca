@@ -1,9 +1,9 @@
-Window = Panel:extend("Window")
+Window = Node:extend("Window")
 
 -- TODO : better window resizing
 function Window:init(sc, name, x, y, title)
 	Node.init(self, sc, name, x, y);
-	self.batch = NodeSpriteBatch(sc, name, 4096, 4096, true);
+	--[[self.batch = NodeSpriteBatch(sc, name, 4096, 4096, true);
 
 	self.batch:add_texture(love.graphics.newImage("assets/rectangle.png"), 1, 1);
 
@@ -20,7 +20,7 @@ function Window:init(sc, name, x, y, title)
 		title,
 		0,
 		3
-	);
+	);]]
 	self.title = title;
 
 	self.w = 100;
@@ -28,25 +28,54 @@ function Window:init(sc, name, x, y, title)
 
 	-- vars for moving the windows
 	self.moving = false;
-	self.mlx = 0; -- mouse last x 
-	self.mly = 0; -- mouse last y
+	self.mox = 0; --mouse offset x
+	self.moy = 0; --mouse offset y
 
 	-- vars for resizing the window
 	self.expanding = false;
 
 	-- window controller
 	self.winc = nil;
+
+	-- window options
+	self.expandable = true;
+	self.movable = true;
+	self.focusable = true;
+	self.evisible = true;
 end
 
 function Window:draw()
-	self.batch:set_color(0.2, 0.2, 0.2, 1);
+    self:stencil();
+ 
+    love.graphics.setStencilTest("greater", 0)
+
+    if self.evisible then
+		love.graphics.setColor(0.2, 0.2, 0.2, 1);
+		love.graphics.rectangle("fill", self:main_box());
+		if self.focus then
+			love.graphics.setColor(0.4, 0.4, 1, 1);
+		else
+			love.graphics.setColor(0.5, 0.5, 1, 1);
+		end
+		love.graphics.rectangle("fill", self:title_box());
+		love.graphics.setColor(0.5, 0.5, 0.5, 1);
+		love.graphics.rectangle("fill", self:expand_box());
+		love.graphics.setColor(1, 1, 1, 1);
+		love.graphics.print(self.title, self.x, self.y);
+	end
+
+	--[[self.batch:set_color(0.2, 0.2, 0.2, 1);
 	self.batch:set_rect(
 		self.batch_ind.main,
 		1,
 		self:main_box()
 	);
 
-	self.batch:set_color(0.4, 0.4, 1, 1);
+	if self.parent.focus then
+		self.batch:set_color(0.4, 0.4, 1, 1);
+	else
+		self.batch:set_color(0.5, 0.5, 1, 1);
+	end
 	self.batch:set_rect(
 		self.batch_ind.title_bar,
 		1,
@@ -64,7 +93,7 @@ function Window:draw()
 		self.batch_ind.title,
 		2,
 		self.x, self.y
-	);
+	);]]
 	--[[self.batch:set_rect(
 		self.batch_ind.close_button,
 		1,
@@ -77,12 +106,12 @@ end
 
 function Window:update(dt)
 	if self.moving then
-		self.x = self.x + (love.mouse.getX() - self.mlx);
-		self.y = self.y + (love.mouse.getY() - self.mly);
+		self.x = love.mouse.getX() - self.mox;
+		self.y = love.mouse.getY() - self.moy;
 	end
 	if self.expanding then
-		self.h = math.max(self.h + (love.mouse.getY() - self.mly), 0);
-		self.w = math.max(self.w + (love.mouse.getX() - self.mlx), 0);
+		self.w = math.max(love.mouse.getX() + self.mox - self.x, 20);
+		self.h = math.max(love.mouse.getY() + self.moy - self.y - 16 , 20);
 	end
 
 	self.mlx = love.mouse.getX();
@@ -90,19 +119,21 @@ function Window:update(dt)
 end
 
 function Window:mousepressed(x, y, b)
-	print(x, y, b);
-	if math.pboverlapraw(
-			x, y,
-			self:title_box()
-		) then
+	if is_hovered(self:title_box()) and self.movable then
 		self.moving = true;
 		self.winc.end_event = true;
-	elseif math.pboverlapraw(
-			x, y,
-			self:expand_box()
-		) then
-		print("expanidng");
+		local xx, yy = self:title_box();
+		self.mox = x - xx;
+		self.moy = y - yy;
+	elseif is_hovered(self:expand_box()) and self.expandable then
 		self.expanding = true;
+		self.winc.end_event = true;
+		local xx, yy = self:expand_box();
+		self.mox = 20 - (x - xx);
+		self.moy = 20 - (y - yy);
+	end
+	if is_hovered(self:full_box()) and self.focusable then
+		self.winc:focus_window(self.name);
 		self.winc.end_event = true;
 	end
 end
@@ -110,6 +141,16 @@ end
 function Window:mousereleased(x, y, b)
 	self.moving = false;
 	self.expanding = false;
+end
+
+function Window:stencil()
+	love.graphics.stencil(function()
+    	love.graphics.rectangle("fill", self:full_box());
+    end, "replace", 1)
+end
+
+function Window:get_y()
+	return Window.super.get_y(self) + 16;
 end
 
 -- boxes defining areas of the window 
@@ -123,4 +164,8 @@ end
 
 function Window:expand_box()
 	return self.x+self.w-20, self.y+self.h-20+16, 20, 20
+end
+
+function Window:full_box()
+	return self.x, self.y, self.w, self.h+16
 end
