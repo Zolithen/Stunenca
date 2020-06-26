@@ -13,6 +13,8 @@ function WindowController:init()
 	Node.init(self, nil, "controller", 0, 0);
 	self.win_stack = {};
 	self.el_providers = {}
+
+	self.wc_stencil = {};
 end
 
 function WindowController:update(dt)
@@ -21,9 +23,21 @@ function WindowController:update(dt)
 	end
 end
 
+function WindowController:predraw()
+	for i, v in ipairs(self.win_stack) do
+		v:propagate_event("predraw");
+	end
+end
+
 function WindowController:draw()
 	for i, v in ipairs(self.win_stack) do
 		v:propagate_event("draw");
+	end
+end
+
+function WindowController:postdraw()
+	for i, v in ipairs(self.win_stack) do
+		v:propagate_event("postdraw");
 	end
 end
 
@@ -56,6 +70,7 @@ end
 
 -- window stuff
 function WindowController:add_window(name, x, y, title)
+	print(name, x, y, title);
 	--local con = WindowContainer(nil, name);
 	local win = Window(nil, name, x, y, title);
 	win.winc = self;
@@ -82,14 +97,20 @@ end
 
 function WindowController:update_window_status()
 	for i, v in ipairs(self.win_stack) do
-		v.focus = i == #self.win_stack-1;
+		v.focus = i == #self.win_stack;
 	end
 end
 
+-- TODO : Add error checking for non existant windows an element providers
 function WindowController:add_element(win, t, ...)
+	print("adding element " .. t .. " to window " .. win .. " ");
 	local w, i = self:find_window(win);
 	local e = self.el_providers[t](w, "test", ...);
 	if e then
-
+		-- TODO : Remove this work around 
+		if t == "subw" then
+			e.winc.el_providers = self.el_providers;
+			e:construct();
+		end
 	end
 end

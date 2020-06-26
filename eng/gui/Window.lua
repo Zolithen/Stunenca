@@ -42,27 +42,45 @@ function Window:init(sc, name, x, y, title)
 	self.movable = true;
 	self.focusable = true;
 	self.evisible = true;
+	self.stencilable = true;
+	self.title_bar = true;
+end
+
+function Window:predraw()
+	if self.focus then
+		love.graphics.setColor(0, 1, 0, 1);
+	else
+		love.graphics.setColor(1, 0, 0, 1);
+	end
+	love.graphics.rectangle("fill", self:outline_box());
 end
 
 function Window:draw()
-    self:stencil();
- 
-    love.graphics.setStencilTest("greater", 0)
+	if self.stencilable then
+    	self:stencil();
+    	love.graphics.setStencilTest("greater", 0);
+	end
 
     if self.evisible then
 		love.graphics.setColor(0.2, 0.2, 0.2, 1);
 		love.graphics.rectangle("fill", self:main_box());
-		if self.focus then
-			love.graphics.setColor(0.4, 0.4, 1, 1);
-		else
-			love.graphics.setColor(0.5, 0.5, 1, 1);
+		if self.title_bar then
+			if self.focus then
+				love.graphics.setColor(0.4, 0.4, 1, 1);
+			else
+				love.graphics.setColor(0.5, 0.5, 1, 1);
+			end
+			love.graphics.rectangle("fill", self:title_box());
+			love.graphics.setColor(1, 1, 1, 1);
+			love.graphics.print(self.title, self.x, self.y);
 		end
-		love.graphics.rectangle("fill", self:title_box());
 		love.graphics.setColor(0.5, 0.5, 0.5, 1);
-		love.graphics.rectangle("fill", self:expand_box());
-		love.graphics.setColor(1, 1, 1, 1);
-		love.graphics.print(self.title, self.x, self.y);
+		if self.expandable then
+			love.graphics.rectangle("fill", self:expand_box());
+		end
 	end
+
+	love.graphics.setColor(1, 1, 1, 1);
 
 	--[[self.batch:set_color(0.2, 0.2, 0.2, 1);
 	self.batch:set_rect(
@@ -155,7 +173,11 @@ end
 
 -- boxes defining areas of the window 
 function Window:main_box()
-	return self.x, self.y+16, self.w, self.h
+	if self.title_bar then
+		return self.x, self.y+16, self.w, self.h
+	else
+		return self:full_box();
+	end
 end
 
 function Window:title_box()
@@ -168,4 +190,8 @@ end
 
 function Window:full_box()
 	return self.x, self.y, self.w, self.h+16
+end
+
+function Window:outline_box()
+	return self.x-2, self.y-2, self.w+4, self.h+20
 end

@@ -91,17 +91,29 @@ egui:register_element("button", Button);
 egui:register_element("subw", SubWindow);
 egui:add_element("test1", "label", "AAAAAAAA", 0, 0);
 egui:add_element("test1", "button", "AAAAAAAAAAAAAAAAAAAAAA", fnt, 0, 16);
-egui:add_element("test2", "subw", 0, 0, 128, 128, 100, 100);
+egui:add_element("test1", "subw", 0, 0, 1000, 1000, 500, 500, function(self)
+	self.winc:add_element("www", "subw", 100, 100, 300, 300, 50, 50);
+end);
+egui:add_element("test2", "subw", 0, 0, 1000, 1000, 500, 500);
 egui:add_element("test2", "label", "wojñsfgbasf", 0, 200);
 --abel(egui, "test1", "sklofa", "iaskfj");
 
 function love.draw()
-	scene:propagate_event("draw");
-	egui:propagate_event("draw");
+	scene:propagate_event("predraw");
+	egui:propagate_event("predraw");
+
 	love.graphics.setStencilTest();
 	love.graphics.setColor(1, 1, 1, 1);
+
+	scene:propagate_event("draw");
+	egui:propagate_event("draw");
+
+	love.graphics.setStencilTest();
+	love.graphics.setColor(1, 1, 1, 1);
+
 	scene:propagate_event("postdraw");
 	egui:propagate_event("postdraw");
+
 	love.graphics.setStencilTest();
 	love.graphics.setColor(1, 1, 1, 1);
 end
