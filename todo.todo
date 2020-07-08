@@ -1,3 +1,9 @@
+
+----- STUNENCA -----
+Add a system to block events in certain directions (dont send to children, stop propagating event, dont send to siblings)
+Node pools for efficient event sending.
+
+----- STUNENCA EXPANSIONS -----
 --- GRAPHICS ---
 Rounded rectangles for batch rendering in some way
 
@@ -11,10 +17,6 @@ Maybe batch everything?
 --- INPUT ---
 
 
---- SCENE GRAPH ---
-Add a system to block events in certain directions (dont send to children, stop propagating event, dont send to siblings)
-Node pools for efficient event sending.
-
 --- MISC ---
 Timer system.
 State machine.
@@ -25,3 +27,11 @@ Add a way to interpret a file system as a tree.
 Create a test framework.
 Add a way to check performance.
 Experiment with an ECS system.
+
+
+
+
+Change name to Stunenca (Simple Tool Usable for Numerous Extensible Node Composited Applications)
+Use the name Vraneva (Various Resources for Agile and Numerous Expansion of Valuable Applications) for
+the superset of tools
+Change the name of the other thing to fit these names
