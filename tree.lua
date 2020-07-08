@@ -42,6 +42,25 @@ return setmetatable(class,{__call = function(_,...) return _class(...) end })
 end
 class = create_30log()
 
+--Node = class("Node.Base");
+
+--[[function Node:call_event(name, ...)
+	if self.name then self[name](self, ...) end
+end]]
+
+--[[function Node:propagate_event(name, ...)
+	self:call_event(name, ...)
+	for i, v in ipairs(self.children) do
+		v:propagate_event(name, ...)
+	end
+end]]
+
+--[[
+
+
+
+]]
+
 lg = love.graphics
 
 Node = class("Node");
@@ -199,3 +218,5 @@ end
 function NodeCache:reset()
 	self.root = nil;
 end
+
+return Node
