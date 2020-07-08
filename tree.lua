@@ -1,5 +1,3 @@
--- TODO : Implement cmath's useful functions on to the engine.
--- TODO : Get my ideas straight and stop changing the engine's core functionality every 6 months
 local function reversedipairsiter(t, i)
     i = i - 1
     if i ~= 0 then
@@ -62,7 +60,6 @@ local function uuid()
     end)
 end
 
--- TODO: Batch node adding
 function Node:init(parent, name, x, y)
 	self.x, self.y = x, y;
 	self.parent = parent;
@@ -70,7 +67,7 @@ function Node:init(parent, name, x, y)
 	self.childs = -1;
 	self.uuid = uuid();
 	self.ev_line = "";
-	math.reseed();
+	math.randomseed(os.time())
 	
 
 	self:count_child();
