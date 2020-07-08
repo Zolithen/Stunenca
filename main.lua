@@ -14,14 +14,21 @@ require "eng/gui/Label"
 require "eng/gui/Button"
 require "eng/gui/SubWindow"
 
-scene = Node(nil, "scene", 0, 0); -- uses absolute positioning
+Position = {
+	x = 0,
+	y = 0
+}
+
+scene = Node(nil, "scene"); -- uses absolute positioning
+
+player = Node(scene, "player");
+
+player:add_component(Position);
 
 -- uses relative positioning
-gui = GuiElement(nil, "gui", 0, 0); -- game's gui
+--[[gui = GuiElement(nil, "gui", 0, 0); -- game's gui
 egui = GuiElement(nil, "egui", 0, 0); -- engine's gui
 
---[[local egui_skin = GuiSkin(egui);
-egui.skin = egui_skin;]]
 
 inp = InputManager(scene);
 
@@ -75,15 +82,15 @@ end
 
 Player(0, 0);
 Player(16, 16);
-Player(32, 32);
+Player(32, 32);]]
 
 --local fnt = love.graphics.newFont("assets/Roboto-Thin.ttf", 14);
-local fnt = love.graphics.getFont();
-egui = WindowController();
+--[[local fnt = love.graphics.getFont();
+egui = WindowController();]]
 
 --[[Window(egui, "test_window", 100, 100, "1");
 Window(egui, "test2", 200, 200, "2");]]
-local win1 = egui:add_window("test1", 100, 100, "1");
+--[[local win1 = egui:add_window("test1", 100, 100, "1");
 local win2 = egui:add_window("test2", 200, 200, "2");
 --win1.evisible = false;
 egui:register_element("label", Label);
@@ -95,11 +102,11 @@ egui:add_element("test1", "subw", 0, 0, 1000, 1000, 500, 500, function(self)
 	self.winc:add_element("www", "subw", 100, 100, 300, 300, 50, 50);
 end);
 egui:add_element("test2", "subw", 0, 0, 1000, 1000, 500, 500);
-egui:add_element("test2", "label", "wojñsfgbasf", 0, 200);
+egui:add_element("test2", "label", "wojñsfgbasf", 0, 200);]]
 --abel(egui, "test1", "sklofa", "iaskfj");
 
 function love.draw()
-	scene:propagate_event("predraw");
+	--[[scene:propagate_event("predraw");
 	egui:propagate_event("predraw");
 
 	love.graphics.setStencilTest();
@@ -115,46 +122,46 @@ function love.draw()
 	egui:propagate_event("postdraw");
 
 	love.graphics.setStencilTest();
-	love.graphics.setColor(1, 1, 1, 1);
+	love.graphics.setColor(1, 1, 1, 1);]]
 end
 
 function love.update(dt)
-	egui:propagate_event_reverse("update", dt);
-	scene:propagate_event_reverse("update", dt);
+	--egui:propagate_event_reverse("update", dt);
+	--scene:propagate_event_reverse("update", dt);
 end
 
 function love.mousepressed(x, y, b)
-	egui:propagate_event_reverse("mousepressed", x, y, b);
-	scene:propagate_event_reverse("mousepressed", x, y, b);
+	--egui:propagate_event_reverse("mousepressed", x, y, b);
+	--scene:propagate_event_reverse("mousepressed", x, y, b);
 end
 
 function love.mousereleased(x, y, b)
-	egui:propagate_event_reverse("mousereleased", x, y, b);
-	scene:propagate_event_reverse("mousereleased", x, y, b);
+	--egui:propagate_event_reverse("mousereleased", x, y, b);
+	--scene:propagate_event_reverse("mousereleased", x, y, b);
 end
 
 function love.mousemoved(x, y, dx, dy)
-	egui:propagate_event_reverse("mousemoved", x, y, dx, dy);
-	scene:propagate_event_reverse("mousemoved", x, y, dx, dy);
+	--egui:propagate_event_reverse("mousemoved", x, y, dx, dy);
+	--scene:propagate_event_reverse("mousemoved", x, y, dx, dy);
 end
 
 function love.wheelmoved(y, x)
-	egui:propagate_event_reverse("wheelmoved", y, x);
-	scene:propagate_event_reverse("wheelmoved", y, x);
+	--egui:propagate_event_reverse("wheelmoved", y, x);
+	--scene:propagate_event_reverse("wheelmoved", y, x);
 end
 
 function love.textinput(t)
-	egui:propagate_event_reverse("textinput", t);
+	--egui:propagate_event_reverse("textinput", t);
 end
 
 function love.keypressed(k)
-	egui:propagate_event_reverse("keypressed", k);
-	scene:propagate_event_reverse("keypressed", k);
+	--egui:propagate_event_reverse("keypressed", k);
+	--scene:propagate_event_reverse("keypressed", k);
 end
 
 function love.keyreleased(k)
-	egui:propagate_event_reverse("keyreleased", k);
-	scene:propagate_event_reverse("keyreleased", k);
+	--egui:propagate_event_reverse("keyreleased", k);
+	--scene:propagate_event_reverse("keyreleased", k);
 end
 
 

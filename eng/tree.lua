@@ -1,4 +1,5 @@
 -- TODO : Implement cmath's useful functions on to the engine.
+-- TODO : Get my ideas straight and stop changing the engine's core functionality every 6 months
 require "cmath"
 class = require "eng/utility/30log"
 
