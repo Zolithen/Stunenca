@@ -1,1 +1,0 @@
-"colored_tilemap.png", "colored_tilemap_packed.png" and all the fonts in the "Fonts" folder are created by Kenney (https://www.kenney.nl/)

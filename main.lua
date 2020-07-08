@@ -1,10 +1,9 @@
-GuiState = {};
 love.graphics.setDefaultFilter("nearest", "nearest");
 
 require "eng/tree"
 
 
-require "eng/utility/Input"
+--[[require "eng/utility/Input"
 require "eng/graphics/SpriteBatch"
 
 require "eng/gui/GuiElement"
@@ -12,18 +11,7 @@ require "eng/gui/WindowController"
 require "eng/gui/Window"
 require "eng/gui/Label"
 require "eng/gui/Button"
-require "eng/gui/SubWindow"
-
-Position = {
-	x = 0,
-	y = 0
-}
-
-scene = Node(nil, "scene"); -- uses absolute positioning
-
-player = Node(scene, "player");
-
-player:add_component(Position);
+require "eng/gui/SubWindow"]]
 
 -- uses relative positioning
 --[[gui = GuiElement(nil, "gui", 0, 0); -- game's gui
