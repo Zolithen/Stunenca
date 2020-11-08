@@ -16,21 +16,6 @@ Maybe batch everything?
 
 --- INPUT ---
 
-
---- MISC ---
-Timer system.
-State machine.
-Efficient serialization system.
-Node factories.
-Add support for Teal.
-Add a way to interpret a file system as a tree.
-Create a test framework.
-Add a way to check performance.
-Experiment with an ECS system.
-
-
-
-
 Change name to Stunenca (Simple Tool Usable for Numerous Extensible Node Composited Applications)
 Use the name Vraneva (Various Resources for Agile and Numerous Expansion of Valuable Applications) for
 the superset of tools

@@ -65,6 +65,8 @@ lg = love.graphics
 
 Node = class("Node");
 NodeCache = class("NodeCache");
+NodePool = class("NodePool");
+NodePoolCenter = class("NodePoolCenter");
 
 Node.children = {};
 
@@ -85,7 +87,6 @@ function Node:init(parent, name, x, y)
 	self.name = name;
 	self.childs = -1;
 	self.uuid = uuid();
-	self.ev_line = "";
 	math.randomseed(os.time())
 	
 
@@ -95,6 +96,10 @@ function Node:init(parent, name, x, y)
 		table.insert(parent.children, self);
 		self.child_index = #parent.children;
 		self.cache = self:get_root().cache;
+
+		if self.cache.pool then
+			self.cache.pool.outdated = true;
+		end
 	else
 		self.cache = NodeCache(self);
 	end
@@ -124,10 +129,26 @@ function Node:add(n)
 end
 
 function Node:propagate_event(name, ...)
-	if self[name] then self[name](self, ...) end
-	for i, v in ipairs(self.children) do
-		v:propagate_event(name, ...);
+
+	if self.cache.pool then
+
+		if self.cache.pool.outdated then
+			self:construct_pool();
+		end
+
+		for i, v in ipairs(self.cache.pool.pooled) do
+			if v[name] then v[name](v, ...); end
+		end
+
+	else
+
+		if self[name] then self[name](self, ...) end
+		for i, v in ipairs(self.children) do
+			v:propagate_event(name, ...);
+		end
+
 	end
+
 end
 
 function Node:propagate_event_reverse(name, ...)
@@ -201,6 +222,23 @@ function Node:remove_all()
 	end
 end
 
+
+function Node:construct_pool()
+	if self.parent == nil then
+		self.cache.pool = NodePool();
+		self:__construct_pool(self.cache.pool);
+	else
+		error("Cannot construct pool in children node.");
+	end
+end
+
+function Node:__construct_pool(pool)
+	table.insert(pool.pooled, self);
+	for i, v in ipairs(self.children) do
+		v:__construct_pool(pool);
+	end
+end
+
 function Node:get_root()
 	if self.cache then return self.cache.root end
 	if self.parent then
@@ -211,12 +249,26 @@ function Node:get_root()
 	end
 end
 
+
+
 function NodeCache:init(root)
 	self.root = root;
 end
 
 function NodeCache:reset()
 	self.root = nil;
+end
+
+
+
+function NodePool:init()
+	self.pooled = {};
+	self.outdated = false;
+	self.auto_update = true;
+end
+
+function NodePool:add(t)
+	table.insert(self.pooled, t);
 end
 
 return Node
