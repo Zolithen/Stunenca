@@ -42,27 +42,9 @@ return setmetatable(class,{__call = function(_,...) return _class(...) end })
 end
 class = create_30log()
 
---Node = class("Node.Base");
-
---[[function Node:call_event(name, ...)
-	if self.name then self[name](self, ...) end
-end]]
-
---[[function Node:propagate_event(name, ...)
-	self:call_event(name, ...)
-	for i, v in ipairs(self.children) do
-		v:propagate_event(name, ...)
-	end
-end]]
-
---[[
-
-
-
-]]
-
 lg = love.graphics
 
+-- 30log classes
 Node = class("Node");
 NodeCache = class("NodeCache");
 NodePool = class("NodePool");
@@ -81,27 +63,33 @@ local function uuid()
     end)
 end
 
+-- Initialize a node:
+-- parent : Node -> The parent this node belongs to.
+-- name : String -> Name of the node
+-- x : Number -> x position of the node
+-- y : Number -> y position of the node
 function Node:init(parent, name, x, y)
 	self.x, self.y = x, y;
 	self.parent = parent;
 	self.name = name;
 	self.childs = -1;
-	self.uuid = uuid();
-	math.randomseed(os.time())
+	self.uuid = uuid(); -- Creates an unique identifier for this node
+	math.randomseed(os.time()) -- Makes identifiers even more random
 	
 
-	self:count_child();
+	self:count_child(); -- Sincerely no idea 
 
-	if parent then
-		table.insert(parent.children, self);
-		self.child_index = #parent.children;
-		self.cache = self:get_root().cache;
 
-		if self.cache.pool then
+	if parent then -- If the node has a parent...
+		table.insert(parent.children, self); -- means this node is children to the parent
+		self.child_index = #parent.children; 
+		self.cache = self:get_root().cache; -- means this node has a root
+
+		if self.cache.pool then -- make the pool update when calling an event
 			self.cache.pool.outdated = true;
 		end
-	else
-		self.cache = NodeCache(self);
+	else -- If the node doesnt have a parent...
+		self.cache = NodeCache(self);  -- means its a root node and needs a cache
 	end
 end
 
@@ -112,6 +100,8 @@ function Node:count_child()
 	end
 end
 
+-- Gets a variable from the root node of this graph
+-- name : String -> The name of the variable to retrieve
 function Node:get_root_attr(name)
 	if self.parent then
 		return self.parent:get_root_attr(name) or nil;
@@ -120,6 +110,8 @@ function Node:get_root_attr(name)
 	end
 end
 
+-- Adds a node to the children list
+-- n : Node -> Node to add
 function Node:add(n)
 	table.insert(self.children, n);
 	n.child_index = #self.children;
@@ -128,6 +120,9 @@ function Node:add(n)
 	end
 end
 
+-- Propagates an event to the entire tree or pool
+-- name : String -> Name of the event
+-- ... -> Arguments to pass onto the event
 function Node:propagate_event(name, ...)
 
 	if self.cache.pool then
@@ -151,6 +146,9 @@ function Node:propagate_event(name, ...)
 
 end
 
+-- Propagates an event to the entire tree going backwards
+-- name : String -> Name of the event
+-- ... -> Arguments to pass onto the event
 function Node:propagate_event_reverse(name, ...)
 	if self[name] then self[name](self, ...) end
 	for i, v in r_ipairs(self.children) do
@@ -158,6 +156,9 @@ function Node:propagate_event_reverse(name, ...)
 	end
 end
 
+-- Finds a node in the tree that satisfies the conditiong
+-- cond : Function -> Function that returns true if the node satisfies the condition
+-- ^ t : Table -> Internal argument used to store the list of found nodes
 function Node:find(cond, t)
 	local t = t or {};
 	for i, v in ipairs(self.children) do
@@ -184,6 +185,7 @@ function Node:find_name(a, t)
 	return t[1];
 end
 
+-- Gets the absolute x of the node
 function Node:get_x()
 	if self.parent then
 		return (self.x or 0) + (self.parent:get_x() or 0);
@@ -192,6 +194,7 @@ function Node:get_x()
 	end
 end
 
+-- Gets the absolute y of the node
 function Node:get_y()
 	if self.parent then
 		return (self.y or 0) + (self.parent:get_y() or 0);
@@ -200,38 +203,40 @@ function Node:get_y()
 	end
 end
 
+-- Safely deletes the node
 function Node:remove()
-	if self.parent then
-		table.remove(self.parent.children, self.child_index);
-		for i, v in ipairs(self.parent.children) do
+	if self.parent then -- If the node has a parent...
+		table.remove(self.parent.children, self.child_index); -- we remove it from the parent's children table
+		for i, v in ipairs(self.parent.children) do -- we update the children index of all the remaining childrens from the parent
 			v.child_index = i;
 		end
 	end
-	for i, v in ipairs(self.children) do
+	for i, v in ipairs(self.children) do -- We delete every children of this node
 		v:remove();
 	end
-	self = nil;
+	self = nil; -- We finally delete the node
 
 end
 
+-- Removes all children nodes
 function Node:remove_all()
 	for i, v in r_ipairs(self.children) do
-		--table.remove(self.children, i);
 		v:remove();
-		--v:remove_all();
 	end
 end
 
-
+-- Constructs a node pool.
 function Node:construct_pool()
 	if self.parent == nil then
 		self.cache.pool = NodePool();
 		self:__construct_pool(self.cache.pool);
 	else
-		error("Cannot construct pool in children node.");
+		error("Cannot construct pool in children node. (WIP)");
 	end
 end
 
+-- Internal function used to construct a pool
+-- pool : NodePool -> The pool to add to
 function Node:__construct_pool(pool)
 	table.insert(pool.pooled, self);
 	for i, v in ipairs(self.children) do
@@ -239,6 +244,7 @@ function Node:__construct_pool(pool)
 	end
 end
 
+-- Gets the root of the scene graph
 function Node:get_root()
 	if self.cache then return self.cache.root end
 	if self.parent then
