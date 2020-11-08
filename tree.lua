@@ -299,7 +299,7 @@ function NodePool:init()
 end
 
 function NodePool:add(t)
-	table.insert(self.pooled, t);
+	table.insert(self.ipooled, t);
 end
 
 return Node
