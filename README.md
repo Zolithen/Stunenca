@@ -6,4 +6,4 @@ This project uses:
 _Copyright 2019-2020 SuperHostile / 128_NyKi
 Licensed under the MIT license https://opensource.org/licenses/MIT_
 
-Stunenca (Simple Tool Usable for Numerous Extensible Node Composited Applications) (yes, that long of a name for something simple) is a one file library that provides a simple tree graph written in pure Lua. WIP.
+Stunenca (Simple Tool Usable for Numerous Extensible Node Composited Applications) (yes, that long of a name for something simple) is a one file library that provides a simple scene graph written in pure Lua. WIP.
