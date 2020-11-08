@@ -48,7 +48,7 @@ lg = love.graphics
 Node = class("Node");
 NodeCache = class("NodeCache");
 NodePool = class("NodePool");
-NodePoolCenter = class("NodePoolCenter");
+NodePoolMap = class("NodePoolMap");
 
 Node.children = {};
 
@@ -131,7 +131,7 @@ function Node:propagate_event(name, ...)
 			self:construct_pool();
 		end
 
-		for i, v in ipairs(self.cache.pool.pooled) do
+		for i, v in ipairs(self.cache.pool.ipooled) do
 			if v[name] then v[name](v, ...); end
 		end
 
@@ -150,9 +150,23 @@ end
 -- name : String -> Name of the event
 -- ... -> Arguments to pass onto the event
 function Node:propagate_event_reverse(name, ...)
-	if self[name] then self[name](self, ...) end
-	for i, v in r_ipairs(self.children) do
-		v:propagate_event_reverse(name, ...);
+	if self.cache.pool then
+
+		if self.cache.pool.outdated then
+			self:construct_pool();
+		end
+
+		for i, v in ipairs(self.cache.pool.rpooled) do
+			if v[name] then v[name](v, ...); end
+		end
+
+	else
+
+		if self[name] then self[name](self, ...) end
+		for i, v in r_ipairs(self.children) do
+			v:propagate_event_reverse(name, ...);
+		end
+
 	end
 end
 
@@ -230,6 +244,7 @@ function Node:construct_pool()
 	if self.parent == nil then
 		self.cache.pool = NodePool();
 		self:__construct_pool(self.cache.pool);
+		self:__construct_reverse_pool(self.cache.pool);
 	else
 		error("Cannot construct pool in children node. (WIP)");
 	end
@@ -238,9 +253,18 @@ end
 -- Internal function used to construct a pool
 -- pool : NodePool -> The pool to add to
 function Node:__construct_pool(pool)
-	table.insert(pool.pooled, self);
+	table.insert(pool.ipooled, self);
 	for i, v in ipairs(self.children) do
 		v:__construct_pool(pool);
+	end
+end
+
+-- Internal function used to construct the reverse of a pool
+-- pool : NodePool -> The pool to add to
+function Node:__construct_reverse_pool(pool)
+	table.insert(pool.rpooled, self);
+	for i, v in r_ipairs(self.children) do
+		v:__construct_reverse_pool(pool);
 	end
 end
 
@@ -268,7 +292,8 @@ end
 
 
 function NodePool:init()
-	self.pooled = {};
+	self.rpooled = {};
+	self.ipooled = {};
 	self.outdated = false;
 	self.auto_update = true;
 end

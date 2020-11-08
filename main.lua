@@ -32,6 +32,7 @@ function Player:update(dt)
 end
 
 function Player:draw()
+	love.graphics.setColor(1, 1, 1, 1);
 	love.graphics.rectangle("fill", self.x, self.y, 16, 16)
 end
 
@@ -48,17 +49,21 @@ end
 
 
 function PoolViewer:draw()
-	for i, v in ipairs(self.cache.pool.pooled) do
+	love.graphics.setColor(1, 0, 0, 1);
+	for i, v in ipairs(self.cache.pool.ipooled) do
 		love.graphics.print(v.name, 0, (i-1)*16);
 	end
+
+	--[[for i, v in ipairs(self.cache.pool.rpooled) do
+		love.graphics.print(v.name, 500, (i-1)*16);
+	end]]
 end
 
 
 function PoolViewer:mousepressed(mx, my, b)
-	print(b, mx, my);
-	for i, v in ipairs(self.cache.pool.pooled) do
+	for i, v in ipairs(self.cache.pool.ipooled) do
 		if math.pboverlapraw(mx, my, 0, (i-1)*16, 100, 16) then
-			table.remove(self.cache.pool.pooled, i);
+			table.remove(self.cache.pool.ipooled, i);
 		end
 	end
 end
