@@ -85,6 +85,10 @@ function Node:init(parent, name, x, y)
 		self.child_index = #parent.children; 
 		self.cache = self:get_root().cache; -- means this node has a root
 
+		if parent.on_add_children then -- Call parent's add children to notify a child has been added
+			parent:on_add_children(self, #parent.children);
+		end
+
 		if self.cache.pool then -- make the pool update when calling an event
 			self.cache.pool.outdated = true;
 		end
@@ -246,7 +250,7 @@ function Node:construct_pool()
 		self:__construct_pool(self.cache.pool);
 		self:__construct_reverse_pool(self.cache.pool);
 	else
-		error("Cannot construct pool in children node. (WIP)");
+		error("Cannot construct pool in children node.");
 	end
 end
 
