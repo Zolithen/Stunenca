@@ -42,28 +42,30 @@ return setmetatable(class,{__call = function(_,...) return _class(...) end })
 end
 class = create_30log()
 
-lg = love.graphics
-
 -- 30log classes
 Node = class("Node");
-NodeCache = class("NodeCache");
-NodePool = class("NodePool");
-NodePoolMap = class("NodePoolMap");
+
+-- This values are returned from Node's events in propagate_event to know how to proceed executing the event
+-- If no response is returned, then normal behaviour is expected
+NodeResponse = {
+	stop = 1, -- Completely stops propagating the event further
+	hwall = 2,  -- Stops propagating the event to the children of the parent node, but not to the children of the current node
+	vwall = 3 -- Stops propagating the event to the children of the current node, but not to the children of the parent node
+}
 
 Node.children = {};
 
--- TODO : change this function cus this code is unlicensed although its a gist
---https://gist.github.com/jrus/3197011
-local random = math.random
+-- Generates an UUID
+-- & : String - > An UUID
 local function uuid()
     local template ='xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'
     return string.gsub(template, '[xy]', function (c)
-        local v = (c == 'x') and random(0, 0xf) or random(8, 0xb)
+        local v = (c == 'x') and math.random(0, 0xf) or math.random(8, 0xb)
         return string.format('%x', v)
     end)
 end
 
--- Initialize a node:
+-- Initialize a node
 -- parent : Node -> The parent this node belongs to.
 -- name : String -> Name of the node
 -- x : Number -> x position of the node
@@ -74,26 +76,16 @@ function Node:init(parent, name, x, y)
 	self.name = name;
 	self.childs = -1;
 	self.uuid = uuid(); -- Creates an unique identifier for this node
-	math.randomseed(os.time()) -- Makes identifiers even more random
-	
 
 	self:count_child(); -- Sincerely no idea 
-
 
 	if parent then -- If the node has a parent...
 		table.insert(parent.children, self); -- means this node is children to the parent
 		self.child_index = #parent.children; 
-		self.cache = self:get_root().cache; -- means this node has a root
 
 		if parent.on_add_children then -- Call parent's add children to notify a child has been added
 			parent:on_add_children(self, #parent.children);
 		end
-
-		if self.cache.pool then -- make the pool update when calling an event
-			self.cache.pool.outdated = true;
-		end
-	else -- If the node doesnt have a parent...
-		self.cache = NodeCache(self);  -- means its a root node and needs a cache
 	end
 end
 
@@ -104,8 +96,9 @@ function Node:count_child()
 	end
 end
 
--- Gets a variable from the root node of this graph
+-- Returns a variable from the root of the tree
 -- name : String -> The name of the variable to retrieve
+-- & : Value
 function Node:get_root_attr(name)
 	if self.parent then
 		return self.parent:get_root_attr(name) or nil;
@@ -118,65 +111,71 @@ end
 -- n : Node -> Node to add
 function Node:add(n)
 	table.insert(self.children, n);
+	n.parent = self;
 	n.child_index = #self.children;
 	if self.on_add_children then
 		self:on_add_children(n, #self.children);
 	end
 end
 
--- Propagates an event to the entire tree or pool
+-- Propagates an event to the entire tree going forwards in the children list
 -- name : String -> Name of the event
 -- ... -> Arguments to pass onto the event
 function Node:propagate_event(name, ...)
-
-	if self.cache.pool then
-
-		if self.cache.pool.outdated then
-			self:construct_pool();
-		end
-
-		for i, v in ipairs(self.cache.pool.ipooled) do
-			if v[name] then v[name](v, ...); end
-		end
-
-	else
-
-		if self[name] then self[name](self, ...) end
-		for i, v in ipairs(self.children) do
-			v:propagate_event(name, ...);
-		end
-
+	local response = false;
+	if self[name] then response = self[name](self, ...) end
+	if response == NodeResponse.stop then
+		return NodeResponse.stop;
 	end
 
+	local has_to_stop = false;
+	if response ~= NodeResponse.vwall then
+		for i, v in ipairs(self.children) do
+			local response1 = v:propagate_event(name, ...);
+			if response1 == NodeResponse.stop then
+				has_to_stop = true;
+				break;
+			end
+		end
+	end
+	if self[name .. "_after_children"] then self[name .. "_after_children"](self, ...) end
+
+	if response == NodeResponse.hwall or has_to_stop then
+		return NodeResponse.stop
+	end
 end
 
--- Propagates an event to the entire tree going backwards
+-- Propagates an event to the entire tree going backwards in the children list
 -- name : String -> Name of the event
 -- ... -> Arguments to pass onto the event
 function Node:propagate_event_reverse(name, ...)
-	if self.cache.pool then
+	local response = false;
+	if self[name] then response = self[name](self, ...) end
+	if response == NodeResponse.stop then
+		return NodeResponse.stop;
+	end
 
-		if self.cache.pool.outdated then
-			self:construct_pool();
-		end
-
-		for i, v in ipairs(self.cache.pool.rpooled) do
-			if v[name] then v[name](v, ...); end
-		end
-
-	else
-
-		if self[name] then self[name](self, ...) end
+	local has_to_stop = false;
+	if response ~= NodeResponse.vwall then
 		for i, v in r_ipairs(self.children) do
-			v:propagate_event_reverse(name, ...);
+			local response1 = v:propagate_event_reverse(name, ...);
+			if response1 == NodeResponse.stop then
+				has_to_stop = true;
+				break;
+			end
 		end
+	end
+	if self[name .. "_after_children"] then self[name .. "_after_children"](self, ...) end
 
+	if response == NodeResponse.hwall or has_to_stop then
+		return NodeResponse.stop;
 	end
 end
 
--- Finds a node in the tree that satisfies the conditiong
+-- Finds all the nodes that satisfy the given conditions
 -- cond : Function -> Function that returns true if the node satisfies the condition
 -- ^ t : Table -> Internal argument used to store the list of found nodes
+-- & : List<Node> -> Table with all the found nodes
 function Node:find(cond, t)
 	local t = t or {};
 	for i, v in ipairs(self.children) do
@@ -188,8 +187,10 @@ function Node:find(cond, t)
 	return t;
 end
 
--- Find the first node named name
--- TODO : Optimization
+-- Find the first node named name under the current node
+-- a : String -> Name of the node to search for
+-- ^ t : Table -> Internal argument to keep track of something
+-- & : Node -> Found node
 function Node:find_name(a, t)
 	local t = t or {};
 	for i, v in ipairs(self.children) do
@@ -197,32 +198,14 @@ function Node:find_name(a, t)
 			table.insert(t, v);
 			break;
 		else
-			t = v:find(a, t);
+			t = v:find_name(a, t);
 		end	
 	end
 	return t[1];
 end
 
--- Gets the absolute x of the node
-function Node:get_x()
-	if self.parent then
-		return (self.x or 0) + (self.parent:get_x() or 0);
-	else
-		return self.x or 0;
-	end
-end
-
--- Gets the absolute y of the node
-function Node:get_y()
-	if self.parent then
-		return (self.y or 0) + (self.parent:get_y() or 0);
-	else
-		return self.y or 0;
-	end
-end
-
--- Safely deletes the node
-function Node:remove()
+-- Safely deletes the node and the references in the parent node
+function Node:delete()
 	if self.parent then -- If the node has a parent...
 		table.remove(self.parent.children, self.child_index); -- we remove it from the parent's children table
 		for i, v in ipairs(self.parent.children) do -- we update the children index of all the remaining childrens from the parent
@@ -230,80 +213,66 @@ function Node:remove()
 		end
 	end
 	for i, v in ipairs(self.children) do -- We delete every children of this node
-		v:remove();
+		v:delete();
 	end
 	self = nil; -- We finally delete the node
-
 end
 
--- Removes all children nodes
-function Node:remove_all()
+-- Deletes all the children's nodes
+function Node:delete_all()
 	for i, v in r_ipairs(self.children) do
-		v:remove();
+		v:delete();
 	end
 end
 
--- Constructs a node pool.
-function Node:construct_pool()
-	if self.parent == nil then
-		self.cache.pool = NodePool();
-		self:__construct_pool(self.cache.pool);
-		self:__construct_reverse_pool(self.cache.pool);
+-- Removes the node from the parent's children list and updates things correctly
+function Node:remove_from_parent()
+	if self.parent then
+		table.remove(self.parent.children, self.child_index); -- we remove it from the parent's children table
+		for i, v in ipairs(self.parent.children) do -- we update the children index of all the remaining childrens from the parent
+			v.child_index = i;
+		end
+		self.parent = nil;
 	else
-		error("Cannot construct pool in children node.");
-	end
-end
-
--- Internal function used to construct a pool
--- pool : NodePool -> The pool to add to
-function Node:__construct_pool(pool)
-	table.insert(pool.ipooled, self);
-	for i, v in ipairs(self.children) do
-		v:__construct_pool(pool);
-	end
-end
-
--- Internal function used to construct the reverse of a pool
--- pool : NodePool -> The pool to add to
-function Node:__construct_reverse_pool(pool)
-	table.insert(pool.rpooled, self);
-	for i, v in r_ipairs(self.children) do
-		v:__construct_reverse_pool(pool);
+		error("Trying to remove parent from orphan node.");
 	end
 end
 
 -- Gets the root of the scene graph
+-- & : Node -> Root node
 function Node:get_root()
-	if self.cache then return self.cache.root end
 	if self.parent then
 		return self.parent:get_root();
-	else
-		self.cache.root = self;
-		return self;
 	end
+	return self;
 end
 
+-- Gets the node set at hierarchy level i with 0 being the master node
+-- i : Integer -> Hierarchy level
+-- & : Node -> Found node
+function Node:get_root_(i)
+	if self.parent then
+		local n, m = self.parent:get_root_(i);
+		if m == 0 then
+			return self, -1;
+		end
+		return n, m - 1;
+	end
 
-
-function NodeCache:init(root)
-	self.root = root;
+	return self, i - 1;
 end
 
-function NodeCache:reset()
-	self.root = nil;
-end
-
-
-
-function NodePool:init()
-	self.rpooled = {};
-	self.ipooled = {};
-	self.outdated = false;
-	self.auto_update = true;
-end
-
-function NodePool:add(t)
-	table.insert(self.ipooled, t);
+-- Returns the given vector in the Node's local coordinate system 
+-- x : Number -> X Coord
+-- y : Number -> Y Coord
+-- &: (Number, Number) -> Transformed coordinates
+function Node:transform_vector(x, y)
+	if self.parent == nil then
+		return x - self.x, y - self.y
+	else
+		local nx, ny = self.parent:transform_vector(x, y);
+		return nx - self.x, ny - self.y
+	end
 end
 
 return Node

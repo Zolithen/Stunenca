@@ -15,14 +15,8 @@ function math.pboverlapraw(x1, y1, x2, y2, w, h)
   )
 end
 
-
-
 Player = Node:extend("Player")
 TestNode = Node:extend("TestNode");
-PoolViewer = Node:extend("PoolViewer");
-
-
-
 
 function Player:update(dt)
 	if lk.isDown("w") then self.y = self.y - 3 end
@@ -41,41 +35,15 @@ end
 
 function TestNode:keypressed(k)
 	if k == "r" then
-		Player(scene, "uwu", 0, 0)
-	elseif k == "t" then
-		self.cache.root:construct_pool();
+		Player(scene, "player", 0, 0)
 	end
 end
-
-
-function PoolViewer:draw()
-	love.graphics.setColor(1, 0, 0, 1);
-	for i, v in ipairs(self.cache.pool.ipooled) do
-		love.graphics.print(v.name, 0, (i-1)*16);
-	end
-
-	--[[for i, v in ipairs(self.cache.pool.rpooled) do
-		love.graphics.print(v.name, 500, (i-1)*16);
-	end]]
-end
-
-
-function PoolViewer:mousepressed(mx, my, b)
-	for i, v in ipairs(self.cache.pool.ipooled) do
-		if math.pboverlapraw(mx, my, 0, (i-1)*16, 100, 16) then
-			table.remove(self.cache.pool.ipooled, i);
-		end
-	end
-end
-
 
 for i = 1, 10 do
-	Player(scene, "uwu", i*16, 0);
+	Player(scene, "player", i*16, 0);
 end
 TestNode(scene, "controller", 0, 0);
-PoolViewer(scene, "pool_viewer", 0, 0);
 
-scene:construct_pool();
 
 function love.update(dt)
 	scene:propagate_event("update", dt)
