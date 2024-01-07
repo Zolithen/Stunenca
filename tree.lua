@@ -74,10 +74,7 @@ function Node:init(parent, name, x, y)
 	self.x, self.y = x, y;
 	self.parent = parent;
 	self.name = name;
-	self.childs = -1;
 	self.uuid = uuid(); -- Creates an unique identifier for this node
-
-	self:count_child(); -- Sincerely no idea 
 
 	if parent then -- If the node has a parent...
 		table.insert(parent.children, self); -- means this node is children to the parent
@@ -86,13 +83,6 @@ function Node:init(parent, name, x, y)
 		if parent.on_add_children then -- Call parent's add children to notify a child has been added
 			parent:on_add_children(self, #parent.children);
 		end
-	end
-end
-
-function Node:count_child()
-	self.childs = self.childs + 1;
-	if self.parent then
-		self.parent:count_child();
 	end
 end
 
